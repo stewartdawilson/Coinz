@@ -17,6 +17,7 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -32,8 +33,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
@@ -50,13 +53,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       /* DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        LocalDateTime now = LocalDateTime.now();
-        String date = dtf.format(now);*/
-        String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/2019/02/02/coinzmap.geojson";
-        Log.d("TEST", mapURL);
-        DownloadFileTask downloadTask = new DownloadFileTask();
-        downloadTask.execute(mapURL);
+
+
 
 
 
@@ -67,65 +65,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.getMapAsync(this);
     }
 
-    void downloadComplete(String result) {
-            result = result;
-    }
-
-
-    @SuppressLint("StaticFieldLeak")
-    class DownloadFileTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            try {
-                return loadFileFromNetwork(urls[0]);
-            } catch (IOException e) {
-                return
-                        "Unable to load content. Check your network connection"
-                        ;
-            }
-        }
-
-        private String loadFileFromNetwork(String urlString) throws IOException {
-            return readStream(downloadUrl(new URL(urlString)));
-        }
-
-        private InputStream downloadUrl(URL url) throws IOException {
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000); // milliseconds
-            conn.setConnectTimeout(15000); // milliseconds
-            conn.setRequestMethod(
-                    "GET"
-            );
-            conn.setDoInput(true);
-            conn.connect();
-            return conn.getInputStream();
-        }
-
-        @NonNull
-        private String readStream(InputStream stream)
-                throws IOException {
-            // Read input from stream, build result as a string
-            StringBuilder sb = new StringBuilder();
-            BufferedReader r = new BufferedReader(new InputStreamReader(stream),1000);
-            for (String line = r.readLine(); line != null; line =r.readLine()){
-                sb.append(line);
-            }
-            stream.close();
-            return sb.toString();
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            super.onPostExecute(result);
-            downloadComplete(result);
-        }
-
-    }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
+        mapboxMap.setCameraPosition(new CameraPosition.Builder()
+                .target(yourLatLng)
+                .zoom(yourZoom)
+                .build());
+        Date date = new Date();
+        String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(date);
+        String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/10/16/coinzmap.geojson";
+        Log.d("TEST", mapURL);
+        DownloadFileTask downloadTask = new DownloadFileTask(map, this);
+        downloadTask.execute(mapURL);
         enableLocation();
     }
 
