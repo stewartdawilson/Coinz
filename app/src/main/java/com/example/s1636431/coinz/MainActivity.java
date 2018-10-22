@@ -69,10 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
-        mapboxMap.setCameraPosition(new CameraPosition.Builder()
-                .target(yourLatLng)
-                .zoom(yourZoom)
-                .build());
+
         Date date = new Date();
         String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(date);
         String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/10/16/coinzmap.geojson";
