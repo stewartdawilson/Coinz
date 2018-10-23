@@ -1,9 +1,17 @@
 package com.example.s1636431.coinz;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 
 import com.mapbox.geojson.Feature;
@@ -73,42 +81,17 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
             throws IOException {
 
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
-        Log.d("TEST", s.hasNext() ? s.next() : "");
         return s.hasNext() ? s.next() : "";
-//        // Read input from stream, build result as a string
-//        StringBuilder sb = new StringBuilder();
-//        BufferedReader r = new BufferedReader(new InputStreamReader(stream),1000);
-//        for (String line = r.readLine(); line != null; line =r.readLine()){
-//            sb.append(line);
-//        }
-//        stream.close();
-//        return sb.toString();
     }
 
     @Override
     protected void onPostExecute(String result)
     {
         super.onPostExecute(result);
+        Log.d("RESULT", result);
         DownloadCompleteRunner.dowloadComplete(result);
-
-        ArrayList<LatLng> points = new ArrayList<>();
-
-        GeoJsonSource source = new GeoJsonSource("geojson", result);
-        map.addSource(source);
-        map.addLayer(new LineLayer("geojson", "geojson"));
-
-        FeatureCollection featureCollection = FeatureCollection.fromJson(result);
-
-        List<Feature> features = featureCollection.features();
-
-        for (Feature f : features) {
-            if (f.geometry() instanceof Point) {
-                LatLng coordinates = (LatLng) ((Point) f.geometry()).coordinates();
-                map.addMarker(
-                        new MarkerOptions().position(coordinates)
-                );
-            }
-        }
+        MapMarkers mapMarkers =  new MapMarkers(map,this.activity, result);
+        mapMarkers.addCoinz(result, this.activity, map);
 
 
     }

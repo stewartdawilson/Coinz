@@ -1,6 +1,7 @@
 package com.example.s1636431.coinz;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LifecycleOwner;
 import android.graphics.Camera;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationLayerPlugin locationLayerPlugin;
     private Location location;
     private Location originLocation;
+    private Location coinlocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("TEST", mapURL);
         DownloadFileTask downloadTask = new DownloadFileTask(map, this);
         downloadTask.execute(mapURL);
+
         enableLocation();
     }
 
@@ -128,8 +132,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         if (location != null) {
             originLocation = location;
+            checkCoinDistance(location);
             setCameraPosition(location);
+
         }
+    }
+
+    public boolean checkCoinDistance(Location location) {
+        List<Feature> features = MapMarkers.getFeatures();
+        for (int i = 0; i<features.size(); i++) {
+
+            coinlocation.setLatitude(features.get(i).geometry().);
+            features.add(featureCollection.features().get(i));
+
+            Feature fc = featureCollection.features().get(i);
+            Point p = (Point) fc.geometry();
     }
 
     @Override
