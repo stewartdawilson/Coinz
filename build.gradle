@@ -7,6 +7,9 @@ buildscript {
         jcenter()
         mavenCentral()
     }
+    dependencies {
+        classpath 'com.google.gms:google-services:4.0.2'
+    }
     buildscript {
         dependencies {
             classpath 'com.android.tools.build:gradle:3.2.1'

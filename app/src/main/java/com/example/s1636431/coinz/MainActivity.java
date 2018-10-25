@@ -132,22 +132,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         if (location != null) {
             originLocation = location;
-            checkCoinDistance(location);
+            //checkCoinDistance(location);
             setCameraPosition(location);
 
         }
     }
 
-    public boolean checkCoinDistance(Location location) {
-        List<Feature> features = MapMarkers.getFeatures();
-        for (int i = 0; i<features.size(); i++) {
-
-            coinlocation.setLatitude(features.get(i).geometry().);
-            features.add(featureCollection.features().get(i));
-
-            Feature fc = featureCollection.features().get(i);
-            Point p = (Point) fc.geometry();
-    }
+//    public boolean checkCoinDistance(Location location) {
+//        List<Feature> features = MapMarkers.getFeatures();
+//        for (int i = 0; i<features.size(); i++) {
+//
+//            coinlocation.setLatitude(features.get(i).geometry().);
+//            features.add(featureCollection.features().get(i));
+//
+//            Feature fc = featureCollection.features().get(i);
+//            Point p = (Point) fc.geometry();
+//    }
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
