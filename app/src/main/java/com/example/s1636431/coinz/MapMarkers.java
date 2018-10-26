@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.util.Log;
 
 import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
@@ -21,6 +22,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,8 +33,8 @@ public class MapMarkers {
     private String result;
     private MarkerOptions marker;
 
-    static List<Feature> features;
-    static List<MarkerOptions> markers;
+
+    private List<MarkerOptions> markers = new ArrayList<>();
 
     public MapMarkers(MapboxMap map, Activity activity, String result) {
         this.map = map;
@@ -40,9 +42,7 @@ public class MapMarkers {
         this.result =  result;
     }
 
-    public static List<Feature> getFeatures() {
-        return features;
-    }
+
 
 
     public void addCoinz(String result, Activity activity, MapboxMap map) {
@@ -50,8 +50,6 @@ public class MapMarkers {
         FeatureCollection featureCollection = FeatureCollection.fromJson(result);
 
         for (int i = 0; i<featureCollection.features().size(); i++) {
-
-            features.add(featureCollection.features().get(i));
 
             Feature fc = featureCollection.features().get(i);
             Point p = (Point) fc.geometry();

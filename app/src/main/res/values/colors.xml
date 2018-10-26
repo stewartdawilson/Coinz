@@ -7,4 +7,10 @@
     <color name="mapboxWhite">#ffffff</color>
     <color name="mapboxBlue">#4264fb</color>
     <color name="mapboxGrayLight">#c6d2e1</color>
+
+    <color name="colorLogin">#3F51B5</color>
+    <color name="colorLoginDark">#303F9F</color>
+    <color name="colorLoginAccent">#FF4081</color>
+    <color name="white">#FFFFFF</color>
+    <color name="signupColor">#066e8a</color>
 </resources>

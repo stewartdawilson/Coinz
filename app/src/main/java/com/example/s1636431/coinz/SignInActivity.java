@@ -1,16 +1,10 @@
 package com.example.s1636431.coinz;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,15 +13,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
-
-public class LoginActivity extends AppCompatActivity {
-
+public class SignInActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    EditText etEmail, etPass;
-    Button btSignUp;
-    Button btAlreadyAccount;
 // in the onCreate method
 
 
@@ -35,24 +23,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        setContentView(R.layout.activity_signup);
-
-        etEmail = (EditText) findViewById(R.id.etRemail);
-        etPass = (EditText) findViewById(R.id.etRpass);
-
-        btSignUp = (Button) findViewById(R.id.btSignUp);
-        btAlreadyAccount = (Button) findViewById(R.id.btAlreadyAccount);
-
-        btSignUp.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = etEmail.getText().toString();
-                String pass =  etPass.getText().toString();
-                createAccount(email, pass);
-            }
-        });
-
-
 
     }
 
@@ -65,23 +35,24 @@ public class LoginActivity extends AppCompatActivity {
     }
     public void createAccount(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("SIGN IN", "createUserWithEmail:success");
-                        Toast.makeText(LoginActivity.this, "Registration Successful",
-                                Toast.LENGTH_SHORT).show();
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        updateUI(user);
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("SIGN IN", "createUserWithEmail:failure", task.getException());
-                        Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
-                        updateUI(null);
-                    }
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("SIGN IN", "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("SIGN IN", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
 
-                    // ...
+                        // ...
+                    }
                 });
     }
 
@@ -98,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("SIGN IN", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
@@ -109,7 +80,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateUI(FirebaseUser user) {
-
     }
 
     public void getCurrentUser() {
