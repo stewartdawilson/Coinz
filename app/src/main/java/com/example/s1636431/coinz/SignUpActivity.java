@@ -17,41 +17,46 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
+
 
     private FirebaseAuth mAuth;
-
     EditText etEmail, etPass;
-    Button btLogin;
-    Button btCreateAccount;
+    Button btSignUp;
+    Button btAlreadyAccount;
+// in the onCreate method
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
 
         etEmail = (EditText) findViewById(R.id.etRemail);
         etPass = (EditText) findViewById(R.id.etRpass);
 
-        btLogin = (Button) findViewById(R.id.btLogin);
-        btCreateAccount = (Button) findViewById(R.id.btCreateAccount);
+        btSignUp = (Button) findViewById(R.id.btSignUp);
+        btAlreadyAccount = (Button) findViewById(R.id.btAlreadyAccount);
 
-        btLogin.setOnClickListener(this);
+        btSignUp.setOnClickListener(this);
+        btAlreadyAccount.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
-        if(view==btLogin) {
-            signIn();
-        } else if(view==btCreateAccount){
-            startActivity(new Intent(LoginActivity.this,SignUpActivity.class));
+        if (view == btSignUp) {
+            createAccount();
+        }
+        if (view == btAlreadyAccount) {
+            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
         }
     }
 
-    public void signIn() {
-
+    public void createAccount() {
         String email = etEmail.getText().toString().trim();
         String password = etPass.getText().toString().trim();
 
@@ -73,25 +78,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-        mAuth.signInWithEmailAndPassword(email, password)
+        mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d("SIGN IN", "signInWithEmail:success");
+                            Log.d("SIGN IN", "createUserWithEmail:success");
+                            Toast.makeText(SignUpActivity.this, "Registration Successful",
+                                    Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                            startActivity(new Intent(SignUpActivity.this,MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("SIGN IN", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Log.w("SIGN IN", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
     }
 
+
 }
+

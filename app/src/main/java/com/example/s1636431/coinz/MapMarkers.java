@@ -19,10 +19,12 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -34,7 +36,9 @@ public class MapMarkers {
     private MarkerOptions marker;
 
 
-    private List<MarkerOptions> markers = new ArrayList<>();
+    public static List<MarkerOptions> markers = new ArrayList<>();
+
+    public static HashMap<String, Feature> features =  new HashMap<>();
 
     public MapMarkers(MapboxMap map, Activity activity, String result) {
         this.map = map;
@@ -71,8 +75,11 @@ public class MapMarkers {
             paint.setTypeface(Typeface.create("Arial",Typeface.BOLD));
             canvas.drawText(fc.properties().get("marker-symbol").getAsString(), 25, 50, paint);
 
+
             JsonObject j = fc.properties();
             if (j.get("currency").getAsString().equals("QUID")) {
+
+                features.put(fc.id(), fc);
 
                 Icon ic_quid = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
@@ -82,6 +89,8 @@ public class MapMarkers {
 
             } else if (j.get("currency").getAsString().equals("SHIL")) {
 
+                features.put(fc.id(), fc);
+
                 Icon ic_shil = IconFactory.getInstance(activity).fromBitmap(bitmap);
                 
                 marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(fc.id()).setIcon(ic_shil);
@@ -90,12 +99,16 @@ public class MapMarkers {
 
             } else if (j.get("currency").getAsString().equals("DOLR")) {
 
+                features.put(fc.id(), fc);
+
                 Icon ic_dolr = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
                 marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(fc.id()).setIcon(ic_dolr);
                 markers.add(marker);
                 map.addMarker(marker);
             } else if (j.get("currency").getAsString().equals("PENY")) {
+
+                features.put(fc.id(), fc);
 
                 Icon ic_peny = IconFactory.getInstance(activity).fromBitmap(bitmap);
 

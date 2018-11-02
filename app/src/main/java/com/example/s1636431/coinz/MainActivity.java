@@ -38,8 +38,10 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
@@ -52,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location location;
     private Location originLocation;
     private Location coinlocation;
+
+    static public List<Coinz> wallet = new ArrayList<Coinz>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,22 +137,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         if (location != null) {
             originLocation = location;
-            //checkCoinDistance(location);
+            checkCoinDistance(location);
             setCameraPosition(location);
 
         }
     }
 
-//    public boolean checkCoinDistance(Location location) {
-//        List<Feature> features = MapMarkers.getFeatures();
-//        for (int i = 0; i<features.size(); i++) {
-//
-//            coinlocation.setLatitude(features.get(i).geometry().);
-//            features.add(featureCollection.features().get(i));
-//
-//            Feature fc = featureCollection.features().get(i);
-//            Point p = (Point) fc.geometry();
-//    }
+    public int checkCoinDistance(Location location) {
+
+      if (MapMarkers.markers.equals(null)) {
+          return -1;
+      }
+      for (int i = 0; i < MapMarkers.markers.size(); i++) {
+
+          if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude()))<20) {
+              Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
+
+              Double value = fc.properties().get("value").getAsDouble();
+              String name = fc.properties().get("currency").getAsString();
+
+              Coinz coin = new Coinz(name, value, this);
+              wallet.add(coin);
+              Log.d("Adding coinz to wallet", coin.toString());
+              map.removeMarker(MapMarkers.markers.get(i).getMarker());
+
+          }
+
+      }
+      return 1;
+    }
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
