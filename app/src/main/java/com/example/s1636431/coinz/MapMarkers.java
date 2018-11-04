@@ -23,6 +23,9 @@ import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +43,8 @@ public class MapMarkers {
 
     public static HashMap<String, Feature> features =  new HashMap<>();
 
+    public static JSONObject rates;
+
     public MapMarkers(MapboxMap map, Activity activity, String result) {
         this.map = map;
         this.activity =  activity;
@@ -53,7 +58,18 @@ public class MapMarkers {
 
         FeatureCollection featureCollection = FeatureCollection.fromJson(result);
 
+        try {
+            JSONObject json = new JSONObject(result);
+            Log.d("TESTING", json.toString());
+            rates = (JSONObject) json.get("rates");
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         for (int i = 0; i<featureCollection.features().size(); i++) {
+
 
             Feature fc = featureCollection.features().get(i);
             Point p = (Point) fc.geometry();
@@ -79,40 +95,41 @@ public class MapMarkers {
             JsonObject j = fc.properties();
             if (j.get("currency").getAsString().equals("QUID")) {
 
-                features.put(fc.id(), fc);
+
+                features.put(j.get("id").toString(), fc);
 
                 Icon ic_quid = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(fc.id()).setIcon(ic_quid);
+                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_quid);
                 markers.add(marker);
                 map.addMarker(marker);
 
             } else if (j.get("currency").getAsString().equals("SHIL")) {
 
-                features.put(fc.id(), fc);
+                features.put(j.get("id").toString(), fc);
 
                 Icon ic_shil = IconFactory.getInstance(activity).fromBitmap(bitmap);
                 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(fc.id()).setIcon(ic_shil);
+                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_shil);
                 markers.add(marker);
                 map.addMarker(marker);
 
             } else if (j.get("currency").getAsString().equals("DOLR")) {
 
-                features.put(fc.id(), fc);
+                features.put(j.get("id").toString(), fc);
 
                 Icon ic_dolr = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(fc.id()).setIcon(ic_dolr);
+                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_dolr);
                 markers.add(marker);
                 map.addMarker(marker);
             } else if (j.get("currency").getAsString().equals("PENY")) {
 
-                features.put(fc.id(), fc);
+                features.put(j.get("id").toString(), fc);
 
                 Icon ic_peny = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(fc.id()).setIcon(ic_peny);
+                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_peny);
                 markers.add(marker);
                 map.addMarker(marker);
 

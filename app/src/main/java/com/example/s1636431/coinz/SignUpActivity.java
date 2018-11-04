@@ -26,6 +26,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     EditText etEmail, etPass;
     Button btSignUp;
     Button btAlreadyAccount;
+
+    static public String emailID;
+
 // in the onCreate method
 
 
@@ -88,6 +91,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             Toast.makeText(SignUpActivity.this, "Registration Successful",
                                     Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
+                            emailID = email;
                             startActivity(new Intent(SignUpActivity.this,MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.

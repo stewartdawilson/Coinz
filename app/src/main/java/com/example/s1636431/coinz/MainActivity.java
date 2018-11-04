@@ -10,6 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -29,6 +34,8 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +47,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location originLocation;
     private Location coinlocation;
 
-    static public List<Coinz> wallet = new ArrayList<Coinz>();
+    static public List<Coinz> walletList = new ArrayList<Coinz>();
+    static public double wallet;
 
 
     @Override
@@ -80,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Date date = new Date();
         String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(date);
-        String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/10/16/coinzmap.geojson";
+        String mapURL = "https://raw.githubusercontent.com/hhowley/JSON_Test/master/appleton.geojson";
         Log.d("TEST", mapURL);
         DownloadFileTask downloadTask = new DownloadFileTask(map, this);
         downloadTask.execute(mapURL);
@@ -135,7 +144,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("TEST", "WORK YOU PIECE OF SHIT");
         if (location != null) {
+
             originLocation = location;
             checkCoinDistance(location);
             setCameraPosition(location);
@@ -145,26 +156,52 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public int checkCoinDistance(Location location) {
 
-      if (MapMarkers.markers.equals(null)) {
-          return -1;
-      }
-      for (int i = 0; i < MapMarkers.markers.size(); i++) {
+        if (MapMarkers.markers.equals(null)) {
+            return -1;
+        } else {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference dRef = db.collection("User").document("Username");
 
-          if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude()))<20) {
-              Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
+            dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    wallet = Double.valueOf(task.getResult().getData().get("wallet").toString());
 
-              Double value = fc.properties().get("value").getAsDouble();
-              String name = fc.properties().get("currency").getAsString();
+                }
+            });
+            for (int i = 0; i < MapMarkers.markers.size(); i++) {
 
-              Coinz coin = new Coinz(name, value, this);
-              wallet.add(coin);
-              Log.d("Adding coinz to wallet", coin.toString());
-              map.removeMarker(MapMarkers.markers.get(i).getMarker());
+                if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
 
-          }
+                    Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
+                    Log.d("TEST", MapMarkers.markers.get(i).getTitle());
 
-      }
-      return 1;
+                    Double value = fc.properties().get("value").getAsDouble();
+                    String name = fc.properties().get("currency").getAsString();
+                    Log.d("TESTING NAME", name);
+                    try {
+                        Double rate = MapMarkers.rates.getDouble(name);
+                        Log.d("ADDING GOLD", "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
+                        wallet += (value * rate);
+                        Log.d("WALLET AMOUNT", Double.toString(wallet));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    Coinz coin = new Coinz(name, value, this);
+                    walletList.add(coin);
+                    Log.d("Adding coinz to wallet", coin.toString());
+                    map.removeMarker(MapMarkers.markers.get(i).getMarker());
+                    MapMarkers.markers.remove(i);
+
+                }
+
+            }
+            HashMap<String, String> data = new HashMap<>();
+            data.put("wallet", Double.toString(wallet));
+            dRef.set(data);
+            return 1;
+        }
     }
 
     @Override
@@ -176,11 +213,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPermissionResult(boolean granted) {
         if (granted) {
             enableLocation();
+        } else {
+            Log.d("UPDATE","permission not granted");
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d("UPDATE","Got permssion");
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
