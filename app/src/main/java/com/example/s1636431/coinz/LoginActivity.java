@@ -34,25 +34,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_login);
 
-        etEmail = (EditText) findViewById(R.id.etRemail);
-        etPass = (EditText) findViewById(R.id.etRpass);
+        etEmail = (EditText) findViewById(R.id.etLemail);
+        etPass = (EditText) findViewById(R.id.etLpass);
 
         btLogin = (Button) findViewById(R.id.btLogin);
         btCreateAccount = (Button) findViewById(R.id.btCreateAccount);
 
         btLogin.setOnClickListener(this);
+        btCreateAccount.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
         if(view==btLogin) {
-            signIn();
-        } else if(view==btCreateAccount){
+            loginIn();
+        }
+        if(view==btCreateAccount){
             startActivity(new Intent(LoginActivity.this,SignUpActivity.class));
         }
     }
 
-    public void signIn() {
+    public void loginIn() {
 
         String email = etEmail.getText().toString().trim();
         String password = etPass.getText().toString().trim();

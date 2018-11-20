@@ -16,7 +16,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
@@ -92,6 +98,18 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
                             emailID = email;
+
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            DocumentReference dRef = db.collection("User").document(email);
+
+                            Map<String, Object> data = new HashMap<>();
+                            ArrayList<Double> wallet = new ArrayList<>();
+                            ArrayList<String> id = new ArrayList<>();
+                            data.put("wallet", wallet);
+                            data.put("id", id);
+                            dRef.set(data, SetOptions.merge());
+
+
                             startActivity(new Intent(SignUpActivity.this,MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.

@@ -2,6 +2,7 @@ package com.example.s1636431.coinz;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.LifecycleOwner;
+import android.content.Intent;
 import android.graphics.Camera;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -9,12 +10,15 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -51,7 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener, View.OnClickListener  {
 
     private String tag = "MainActivity";
     private MapView mapView;
@@ -64,7 +68,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location coinlocation;
 
     static public List<Coinz> walletList = new ArrayList<Coinz>();
-    static public double wallet;
+    //static public double wallet;
+    static public HashMap<String, Double> wallet = new HashMap<>();
+    static public Object wallet_data = new Object();
+    static public String email;
+
+    Button btMenu;
 
 
     @Override
@@ -75,12 +84,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
+
+        btMenu = (Button) findViewById(R.id.btMenu);
+        btMenu.setOnClickListener(this);
+
+        if (SignUpActivity.emailID != null) {
+            email = SignUpActivity.emailID;
+        } else if(LoginActivity.emailID != null) {
+            email = LoginActivity.emailID;
+        }
+
+
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     }
+
+    @Override
+    public void onClick(View view) {
+        if(view==btMenu) {
+            startActivity(new Intent(MainActivity.this,MenuActivity.class));
+        }
+    }
+
 
 
     @Override
@@ -154,53 +183,60 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public int checkCoinDistance(Location location) {
+    public boolean checkCoinDistance(Location location) {
+
+        Log.d("EMAIL", email);
+
 
         if (MapMarkers.markers.equals(null)) {
-            return -1;
+            return false;
         } else {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference dRef = db.collection("User").document("Username");
-
+            DocumentReference dRef = db.collection("User").document(email);
             dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    wallet = Double.valueOf(task.getResult().getData().get("wallet").toString());
 
+                    wallet_data = task.getResult().getData().get("wallet");
+                    wallet = (HashMap<String, Double>) wallet_data;
+                    Log.d("WALLET", wallet_data.toString());
+
+
+                    for (int i = 0; i < MapMarkers.markers.size(); i++) {
+
+                        if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
+
+                            Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
+                            Log.d("TEST", MapMarkers.markers.get(i).getTitle());
+
+                            Double value = fc.properties().get("value").getAsDouble();
+                            String name = fc.properties().get("currency").getAsString();
+                            String id_fc = fc.properties().get("id").getAsString();
+                            Log.d("TESTING NAME", name);
+                            try {
+                                Double rate = MapMarkers.rates.getDouble(name);
+                                Log.d("ADDING GOLD", "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
+                                wallet.put(id_fc, value * rate);
+                                Log.d("WALLET AMOUNT", wallet.toString());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            Coinz coin = new Coinz(name, value, MainActivity.this);
+                            walletList.add(coin);
+                            Log.d("Adding coinz to wallet", coin.toString());
+                            map.removeMarker(MapMarkers.markers.get(i).getMarker());
+                            MapMarkers.markers.remove(i);
+
+                        }
+
+                    }
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("wallet", wallet);
+                    dRef.set(data, SetOptions.merge());
                 }
             });
-            for (int i = 0; i < MapMarkers.markers.size(); i++) {
-
-                if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
-
-                    Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
-                    Log.d("TEST", MapMarkers.markers.get(i).getTitle());
-
-                    Double value = fc.properties().get("value").getAsDouble();
-                    String name = fc.properties().get("currency").getAsString();
-                    Log.d("TESTING NAME", name);
-                    try {
-                        Double rate = MapMarkers.rates.getDouble(name);
-                        Log.d("ADDING GOLD", "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
-                        wallet += (value * rate);
-                        Log.d("WALLET AMOUNT", Double.toString(wallet));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    Coinz coin = new Coinz(name, value, this);
-                    walletList.add(coin);
-                    Log.d("Adding coinz to wallet", coin.toString());
-                    map.removeMarker(MapMarkers.markers.get(i).getMarker());
-                    MapMarkers.markers.remove(i);
-
-                }
-
-            }
-            HashMap<String, String> data = new HashMap<>();
-            data.put("wallet", Double.toString(wallet));
-            dRef.set(data);
-            return 1;
+            return true;
         }
     }
 
