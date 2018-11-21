@@ -10,8 +10,8 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="48dp">
 
         <Button
             android:id="@+id/btBank"
@@ -20,6 +20,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:background="@drawable/shapelogin"
             android:text="Bank"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -37,13 +38,14 @@
             app:layout_constraintTop_toBottomOf="@+id/userID" />
 
         <Button
-            android:id="@+id/btFriends"
+            android:id="@+id/btCommunity"
             android:layout_width="271dp"
             android:layout_height="69dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:text="Friends List"
+            android:background="@drawable/shapelogin"
+            android:text="Community"
             app:layout_constraintBottom_toTopOf="@+id/btBank"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.505"
@@ -56,6 +58,7 @@
             android:layout_marginBottom="4dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:background="@drawable/shapelogin"
             android:text="Play!"
             app:layout_constraintBottom_toTopOf="@+id/btStat"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,8 +72,9 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:background="@drawable/shapelogin"
             android:text="Statistics"
-            app:layout_constraintBottom_toTopOf="@+id/btFriends"
+            app:layout_constraintBottom_toTopOf="@+id/btCommunity"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.505"
             app:layout_constraintStart_toStartOf="parent" />
@@ -85,6 +89,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/profile"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"
+            app:layout_constraintBottom_toTopOf="@+id/btPlay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/walletID" />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

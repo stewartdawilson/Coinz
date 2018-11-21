@@ -103,12 +103,14 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             DocumentReference dRef = db.collection("User").document(email);
 
                             Map<String, Object> data = new HashMap<>();
-                            ArrayList<Double> wallet = new ArrayList<>();
-                            ArrayList<String> id = new ArrayList<>();
-                            data.put("wallet", wallet);
-                            data.put("id", id);
-                            dRef.set(data, SetOptions.merge());
+                            HashMap<String, Double> wallet = new HashMap<>();
+                            ArrayList<String> collected =  new ArrayList<>();
+                            HashMap<String,HashMap<String, String>> friends =  new HashMap<>();
 
+                            data.put("wallet", wallet);
+                            data.put("collected", collected);
+                            data.put("friends", friends);
+                            dRef.set(data, SetOptions.merge());
 
                             startActivity(new Intent(SignUpActivity.this,MainActivity.class));
                         } else {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4264fb</color>
-    <color name="colorPrimaryDark">#4264fb</color>
-    <color name="colorAccent">#4264fb</color>
+    <color name="colorPrimary">#d8a900</color>
+    <color name="colorPrimaryDark">#d8a900</color>
+    <color name="colorAccent">#d8a900</color>
 
     <color name="mapboxWhite">#ffffff</color>
     <color name="mapboxBlue">#4264fb</color>

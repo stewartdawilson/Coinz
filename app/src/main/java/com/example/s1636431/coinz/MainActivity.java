@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+
+
+
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
 
@@ -225,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Coinz coin = new Coinz(name, value, MainActivity.this);
                             walletList.add(coin);
                             Log.d("Adding coinz to wallet", coin.toString());
+                            MapMarkers.collected.add(fc.properties().get("id").getAsString());
                             map.removeMarker(MapMarkers.markers.get(i).getMarker());
                             MapMarkers.markers.remove(i);
 
@@ -233,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     Map<String, Object> data = new HashMap<>();
                     data.put("wallet", wallet);
+                    data.put("collected", MapMarkers.collected);
                     dRef.set(data, SetOptions.merge());
                 }
             });

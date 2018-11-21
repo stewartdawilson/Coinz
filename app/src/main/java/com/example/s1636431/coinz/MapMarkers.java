@@ -45,6 +45,9 @@ public class MapMarkers {
 
     public static JSONObject rates;
 
+    public static ArrayList<String> collected = new ArrayList<>();
+    public boolean taken;
+
     public MapMarkers(MapboxMap map, Activity activity, String result) {
         this.map = map;
         this.activity =  activity;
@@ -72,6 +75,16 @@ public class MapMarkers {
 
 
             Feature fc = featureCollection.features().get(i);
+            for (int j = 0; j<collected.size(); j++) {
+                if(fc.properties().get("id").getAsString().equals(collected.get(i))) {
+                    taken = true;
+
+                }
+            }
+            if(taken==true ) {
+                continue;
+            }
+
             Point p = (Point) fc.geometry();
 
 
