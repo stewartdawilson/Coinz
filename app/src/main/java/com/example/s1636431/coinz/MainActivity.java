@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //static public double wallet;
     static public HashMap<String, Double> wallet = new HashMap<>();
     static public Object wallet_data = new Object();
-    static public String email;
+    static public String mainemail;
 
     Button btMenu;
 
@@ -95,9 +95,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btMenu.setOnClickListener(this);
 
         if (SignUpActivity.emailID != null) {
-            email = SignUpActivity.emailID;
+            mainemail = SignUpActivity.emailID;
         } else if(LoginActivity.emailID != null) {
-            email = LoginActivity.emailID;
+            mainemail = LoginActivity.emailID;
         }
 
 
@@ -188,14 +188,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public boolean checkCoinDistance(Location location) {
 
-        Log.d("EMAIL", email);
+        Log.d("EMAIL", mainemail);
 
 
         if (MapMarkers.markers.equals(null)) {
             return false;
         } else {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference dRef = db.collection("User").document(email);
+            DocumentReference dRef = db.collection("User").document(mainemail);
             dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {

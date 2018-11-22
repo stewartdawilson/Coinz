@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -56,9 +55,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         btStat.setOnClickListener(this);
 
 
-
-        textUser.setText(MainActivity.email);
-        Log.d("USER", MainActivity.email);
+        Log.d("USER", MainActivity.mainemail);
+        textUser.setText(MainActivity.mainemail);
         // Got from stack overflow
         textWallet.setText("Wallet: " + Double.toString(Math.round(MainActivity.wallet.values().stream().mapToDouble(Number::doubleValue).sum())) + " Gold");
         getProfilePicture();
@@ -79,10 +77,10 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void getProfilePicture() {
-        userProfile = (ImageView) findViewById(R.id.profile);
+        userProfile = (ImageView) findViewById(R.id.userImage);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference dRef = db.collection("User").document(MainActivity.email);
+        DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
