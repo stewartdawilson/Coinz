@@ -27,6 +27,7 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -65,13 +66,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationLayerPlugin locationLayerPlugin;
     private Location location;
     private Location originLocation;
-    private Location coinlocation;
+    private Location last_location;
 
     static public List<Coinz> walletList = new ArrayList<Coinz>();
     //static public double wallet;
     static public HashMap<String, Double> wallet = new HashMap<>();
+    static public ArrayList<String> collected = new ArrayList<>();
     static public Object wallet_data = new Object();
     static public String mainemail;
+
 
     Button btMenu;
 
@@ -89,10 +92,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btMenu = (Button) findViewById(R.id.btMenu);
         btMenu.setOnClickListener(this);
 
-        if(LoginActivity.emailID != null) {
+        if(LoginActivity.loggedIn) {
             mainemail = LoginActivity.emailID;
             SignUpActivity.emailID = "";
-        } else if (SignUpActivity.emailID != null) {
+        }
+        if (SignUpActivity.signedIn) {
             mainemail = SignUpActivity.emailID;
             LoginActivity.emailID = "";
         }
@@ -115,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
+        wipeMap(map);
 
         Date date = new Date();
         String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(date);
@@ -124,6 +129,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         downloadTask.execute(mapURL);
 
         enableLocation();
+    }
+
+    private void wipeMap(MapboxMap map) {
+        for(Marker marker : map.getMarkers()) {
+            map.removeMarker(marker);
+        }
     }
 
     private void enableLocation() {
@@ -175,7 +186,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         Log.d("TEST", "WORK YOU PIECE OF SHIT");
         if (location != null) {
-
+            if(originLocation != null) {
+                last_location = originLocation;
+            } else {
+                last_location = location;
+            }
             originLocation = location;
             checkCoinDistance(location);
             setCameraPosition(location);
@@ -183,9 +198,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private double calculateDistance(Location location_now,Location location_prev) {
+        final int R = 6371;
+        // Radius of the earth in km
+        double dLat = deg2rad(location_prev.getLatitude() - location_now.getLatitude());
+        // deg2rad below
+        double dLon = deg2rad(location_prev.getLongitude() - location_now.getLongitude());
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(location_now.getLatitude())) * Math.cos(deg2rad(location_prev.getLatitude())) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double d = R * c;
+        // Distance in km
+        return d;
+    }
+
+    private double deg2rad(double deg) {
+        return deg * (Math.PI / 180);
+    }
+
+
     public boolean checkCoinDistance(Location location) {
 
-        Log.d("EMAIL", mainemail);
 
 
         if (MapMarkers.markers.equals(null)) {
@@ -197,11 +229,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
-                    wallet_data = task.getResult().getData().get("wallet");
-                    wallet = (HashMap<String, Double>) wallet_data;
+
+                    wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
+                    collected = (ArrayList<String>) task.getResult().getData().get("collected");
+
                     Log.d("WALLET", wallet_data.toString());
 
-
+                    Map<String, Object> data = new HashMap<>();
                     for (int i = 0; i < MapMarkers.markers.size(); i++) {
 
                         if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
@@ -225,16 +259,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Coinz coin = new Coinz(name, value, MainActivity.this);
                             walletList.add(coin);
                             Log.d("Adding coinz to wallet", coin.toString());
-                            MapMarkers.collected.add(fc.properties().get("id").getAsString());
+                            collected.add(fc.properties().get("id").getAsString());
                             map.removeMarker(MapMarkers.markers.get(i).getMarker());
                             MapMarkers.markers.remove(i);
 
                         }
 
                     }
-                    Map<String, Object> data = new HashMap<>();
+                    Double dist = calculateDistance(originLocation, last_location);
+                    Double old_dist = task.getResult().getDouble("distance");
+                    Double new_dist = dist+old_dist;
+
+                    Long gold = Math.round(MainActivity.wallet.values().stream().mapToDouble(Number::doubleValue).sum());
+                    data.put("gold_alltime", gold);
+                    data.put("distance", new_dist);
                     data.put("wallet", wallet);
-                    data.put("collected", MapMarkers.collected);
+                    data.put("collected", collected);
                     dRef.set(data, SetOptions.merge());
                 }
             });

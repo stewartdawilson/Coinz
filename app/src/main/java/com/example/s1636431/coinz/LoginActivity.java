@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button btCreateAccount;
 
     static public String emailID;
+    static public Boolean loggedIn;
 
 
     @Override
@@ -87,6 +88,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Log.d("SIGN IN", "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             emailID = email;
+                            loggedIn = true;
+                            SignUpActivity.signedIn = false;
                             startActivity(new Intent(LoginActivity.this,MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.

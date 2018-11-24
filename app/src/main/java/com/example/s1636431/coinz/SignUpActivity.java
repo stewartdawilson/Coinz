@@ -34,6 +34,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     Button btAlreadyAccount;
 
     static public String emailID;
+    static public Boolean signedIn;
 
 // in the onCreate method
 
@@ -98,6 +99,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
                             emailID = email;
+                            signedIn = true;
+                            LoginActivity.loggedIn = false;
 
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                             DocumentReference dRef = db.collection("User").document(email);
@@ -106,12 +109,18 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             HashMap<String, Double> wallet = new HashMap<>();
                             ArrayList<String> collected =  new ArrayList<>();
                             ArrayList<HashMap<String, String>> friends =  new ArrayList<>();
+                            Double distance = 0.0;
+                            Double gold = 0.0;
                             String user_image = "";
 
                             data.put("wallet", wallet);
                             data.put("collected", collected);
                             data.put("friends", friends);
                             data.put("user_image", user_image);
+                            data.put("distance", distance);
+                            data.put("gold_alltime", gold);
+
+
                             dRef.set(data, SetOptions.merge());
 
                             startActivity(new Intent(SignUpActivity.this,MainActivity.class));

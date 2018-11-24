@@ -7,10 +7,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -45,7 +52,6 @@ public class MapMarkers {
 
     public static JSONObject rates;
 
-    public static ArrayList<String> collected = new ArrayList<>();
     public boolean taken;
 
     public MapMarkers(MapboxMap map, Activity activity, String result) {
@@ -58,95 +64,107 @@ public class MapMarkers {
 
 
     public void addCoinz(String result, Activity activity, MapboxMap map) {
-
-        FeatureCollection featureCollection = FeatureCollection.fromJson(result);
-
-        try {
-            JSONObject json = new JSONObject(result);
-            Log.d("TESTING", json.toString());
-            rates = (JSONObject) json.get("rates");
+        markers.clear();
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+        dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+             @Override
+             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                 ArrayList<String> collected = (ArrayList<String>) task.getResult().getData().get("collected");
+                 FeatureCollection featureCollection = FeatureCollection.fromJson(result);
 
-        for (int i = 0; i<featureCollection.features().size(); i++) {
-
-
-            Feature fc = featureCollection.features().get(i);
-            for (int j = 0; j<collected.size(); j++) {
-                if(fc.properties().get("id").getAsString().equals(collected.get(i))) {
-                    taken = true;
-
-                }
-            }
-            if(taken==true ) {
-                continue;
-            }
-
-            Point p = (Point) fc.geometry();
+                 try {
+                     JSONObject json = new JSONObject(result);
+                     Log.d("TESTING", json.toString());
+                     rates = (JSONObject) json.get("rates");
 
 
-            Drawable vectorDrawable = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.mapbox_marker_icon_default, activity.getTheme());
-            Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                    vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
+                 } catch (JSONException e) {
+                     e.printStackTrace();
+                 }
 
-            vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            DrawableCompat.setTint(vectorDrawable, Color.parseColor(fc.properties().get("marker-color").getAsString()));
-            vectorDrawable.draw(canvas);
-
-            Paint paint = new Paint();
-            paint.setColor(Color.WHITE);
-            paint.setTextAlign(Paint.Align.CENTER);
-            paint.setTextSize(50);
-            paint.setTypeface(Typeface.create("Arial",Typeface.BOLD));
-            canvas.drawText(fc.properties().get("marker-symbol").getAsString(), 25, 50, paint);
+                 for (int i = 0; i<featureCollection.features().size(); i++) {
+                     taken = false;
 
 
-            JsonObject j = fc.properties();
-            if (j.get("currency").getAsString().equals("QUID")) {
+                     Feature fc = featureCollection.features().get(i);
+                     for (int j = 0; j<collected.size(); j++) {
+                         if(fc.properties().get("id").getAsString().equals(collected.get(j))) {
+                             taken = true;
+
+                         }
+                     }
+                     if(taken==true ) {
+                         continue;
+                     }
+
+                     Point p = (Point) fc.geometry();
 
 
-                features.put(j.get("id").toString(), fc);
+                     Drawable vectorDrawable = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.mapbox_marker_icon_default, activity.getTheme());
+                     Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                             vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                     Canvas canvas = new Canvas(bitmap);
 
-                Icon ic_quid = IconFactory.getInstance(activity).fromBitmap(bitmap);
+                     vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                     DrawableCompat.setTint(vectorDrawable, Color.parseColor(fc.properties().get("marker-color").getAsString()));
+                     vectorDrawable.draw(canvas);
 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_quid);
-                markers.add(marker);
-                map.addMarker(marker);
+                     Paint paint = new Paint();
+                     paint.setColor(Color.WHITE);
+                     paint.setTextAlign(Paint.Align.CENTER);
+                     paint.setTextSize(50);
+                     paint.setTypeface(Typeface.create("Arial",Typeface.BOLD));
+                     canvas.drawText(fc.properties().get("marker-symbol").getAsString(), 25, 50, paint);
 
-            } else if (j.get("currency").getAsString().equals("SHIL")) {
 
-                features.put(j.get("id").toString(), fc);
+                     JsonObject j = fc.properties();
+                     if (j.get("currency").getAsString().equals("QUID")) {
 
-                Icon ic_shil = IconFactory.getInstance(activity).fromBitmap(bitmap);
-                
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_shil);
-                markers.add(marker);
-                map.addMarker(marker);
 
-            } else if (j.get("currency").getAsString().equals("DOLR")) {
+                         features.put(j.get("id").toString(), fc);
 
-                features.put(j.get("id").toString(), fc);
+                         Icon ic_quid = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
-                Icon ic_dolr = IconFactory.getInstance(activity).fromBitmap(bitmap);
+                         marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_quid);
+                         markers.add(marker);
+                         map.addMarker(marker);
 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_dolr);
-                markers.add(marker);
-                map.addMarker(marker);
-            } else if (j.get("currency").getAsString().equals("PENY")) {
+                     } else if (j.get("currency").getAsString().equals("SHIL")) {
 
-                features.put(j.get("id").toString(), fc);
+                         features.put(j.get("id").toString(), fc);
 
-                Icon ic_peny = IconFactory.getInstance(activity).fromBitmap(bitmap);
+                         Icon ic_shil = IconFactory.getInstance(activity).fromBitmap(bitmap);
 
-                marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_peny);
-                markers.add(marker);
-                map.addMarker(marker);
+                         marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_shil);
+                         markers.add(marker);
+                         map.addMarker(marker);
 
-            }
-        }
+                     } else if (j.get("currency").getAsString().equals("DOLR")) {
+
+                         features.put(j.get("id").toString(), fc);
+
+                         Icon ic_dolr = IconFactory.getInstance(activity).fromBitmap(bitmap);
+
+                         marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_dolr);
+                         markers.add(marker);
+                         map.addMarker(marker);
+                     } else if (j.get("currency").getAsString().equals("PENY")) {
+
+                         features.put(j.get("id").toString(), fc);
+
+                         Icon ic_peny = IconFactory.getInstance(activity).fromBitmap(bitmap);
+
+                         marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_peny);
+                         markers.add(marker);
+                         map.addMarker(marker);
+
+                     }
+                 }
+
+             }
+         });
     }
 }

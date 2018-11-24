@@ -45,6 +45,9 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+
+import timber.log.Timber;
 
 
 public class FriendsListFragment extends Fragment {
@@ -76,8 +79,6 @@ public class FriendsListFragment extends Fragment {
         task_running = true;
         data.clear();
         getFriends(getContext());
-
-        Log.d(TAG, data.toString());
 
 
         search_list = (SearchView) view.findViewById(R.id.search_list);
@@ -118,19 +119,18 @@ public class FriendsListFragment extends Fragment {
     private void search_user(String query, Context context) {
         searched_user.clear();
 
-        String searched_email = query;
-        if (!searched_email.isEmpty()) {
+        if (!query.isEmpty()) {
             data.clear();
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference dRef = db.collection("User").document(searched_email);
+            DocumentReference dRef = db.collection("User").document(query);
             dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
-                    if (task.getResult().exists()) {
+                    if (Objects.requireNonNull(task.getResult()).exists()) {
                         HashMap<String, String> user = new HashMap<>();
-                        user.put("email", searched_email);
+                        user.put("email", query);
 
                         HashMap<String, Bitmap> user_data = new HashMap<>();
                         if (!task.getResult().getData().get("user_image").toString().isEmpty()) {
@@ -139,7 +139,7 @@ public class FriendsListFragment extends Fragment {
                             user.put("user_image", search_image_url);
                             searched_user.add(user);
 
-                            Log.d(TAG, "Getting user: " + searched_email);
+                            Timber.tag(TAG).d("Getting user: %s", query);
 
                             FirebaseStorage storage = FirebaseStorage.getInstance();
                             StorageReference storageReference = storage.getReference();
@@ -153,13 +153,11 @@ public class FriendsListFragment extends Fragment {
                                 public void onSuccess(byte[] bytes) {
                                     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
                                     Bitmap bitmap;
-                                    if (inputStream != null) {
-                                        bitmap = BitmapFactory.decodeStream(inputStream);
-                                        user_data.put(searched_email, bitmap);
-                                        data.add(user_data);
-                                        Log.d(TAG, "Adding searched user: " + searched_email + " to data: " + data.toString());
-                                        friendadapter.notifyDataSetChanged();
-                                    }
+                                    bitmap = BitmapFactory.decodeStream(inputStream);
+                                    user_data.put(query, bitmap);
+                                    data.add(user_data);
+                                    Timber.tag(TAG).d("Adding searched user: " + query + " to data: " + data.toString());
+                                    friendadapter.notifyDataSetChanged();
                                 }
 
                             });
@@ -167,21 +165,21 @@ public class FriendsListFragment extends Fragment {
                         } else {
                             user.put("user_image", "");
                             searched_user.add(user);
-                            Bitmap default_image = drawableToBitmap(context.getDrawable(R.drawable.ic_user));
-                            user_data.put(searched_email, default_image);
-                            Log.d(TAG, "Adding searched user: " + searched_email + " to data: " + data.toString());
+                            Bitmap default_image = drawableToBitmap(Objects.requireNonNull(context.getDrawable(R.drawable.ic_user)));
+                            user_data.put(query, default_image);
+                            Timber.tag(TAG).d("Adding searched user: " + query + " to data: " + data.toString());
                             data.add(user_data);
                             friendadapter.notifyDataSetChanged();
                         }
                     } else {
                         Toast.makeText(getContext(), "User doesn't exist!", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "Searched User that doesn't exist");
+                        Timber.tag(TAG).d("Searched User that doesn't exist");
                     }
 
                 }
             });
         } else {
-            Log.d(TAG, "Search empty");
+            Timber.tag(TAG).d("Search empty");
         }
     }
 
@@ -212,7 +210,9 @@ public class FriendsListFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
-                Log.d(TAG, "Getting friends: " + friends.toString());
+                if (friends != null) {
+                    Timber.tag(TAG).d("Getting friends: %s", friends.toString());
+                }
                 addFriendsList(friends, context);
                 task_running = false;
             }
@@ -235,38 +235,41 @@ public class FriendsListFragment extends Fragment {
                 HashMap<String, Bitmap> friend_data = new HashMap<>();
 
                 String friend_email = friend.get("email");
-                if (!friend.get("user_image").isEmpty()) {
+                if (!Objects.requireNonNull(friend.get("user_image")).isEmpty()) {
 
                     String image_url = friend.get("user_image");
 
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference storageReference = storage.getReference();
 
-                    StorageReference path = storageReference.child(image_url);
+                    StorageReference path = null;
+                    if (image_url != null) {
+                        path = storageReference.child(image_url);
+                    }
 
                     final long one_megabyte = 1024 * 1024;
 
-                    path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-                            Bitmap bitmap;
-                            if (inputStream != null) {
+                    if (path != null) {
+                        path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                            @Override
+                            public void onSuccess(byte[] bytes) {
+                                ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+                                Bitmap bitmap;
                                 bitmap = BitmapFactory.decodeStream(inputStream);
                                 friend_data.put(friend_email,bitmap);
                                 data.add(friend_data);
-                                Log.d(TAG, "Adding user: " + friend.get("email") + " to data: " + data.toString());
+                                Timber.tag(TAG).d("Adding user: " + friend.get("email") + " to data: " + data.toString());
                                 friendadapter.notifyDataSetChanged();
 
                             }
-                        }
 
-                    });
+                        });
+                    }
 
                 } else {
-                    Bitmap default_image = drawableToBitmap(context.getDrawable(R.drawable.ic_user));
+                    Bitmap default_image = drawableToBitmap(Objects.requireNonNull(context.getDrawable(R.drawable.ic_user)));
                     friend_data.put(friend_email,default_image);
-                    Log.d(TAG, "Adding user: " + friend.get("email") + " to data: " + data.toString());
+                    Timber.tag(TAG).d("Adding user: " + friend.get("email") + " to data: " + data.toString());
                     data.add(friend_data);
                     friendadapter.notifyDataSetChanged();
                 }
