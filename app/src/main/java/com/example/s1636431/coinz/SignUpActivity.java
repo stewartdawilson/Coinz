@@ -105,11 +105,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             Map<String, Object> data = new HashMap<>();
                             HashMap<String, Double> wallet = new HashMap<>();
                             ArrayList<String> collected =  new ArrayList<>();
-                            HashMap<String,HashMap<String, String>> friends =  new HashMap<>();
+                            ArrayList<HashMap<String, String>> friends =  new ArrayList<>();
+                            String user_image = "";
 
                             data.put("wallet", wallet);
                             data.put("collected", collected);
                             data.put("friends", friends);
+                            data.put("user_image", user_image);
                             dRef.set(data, SetOptions.merge());
 
                             startActivity(new Intent(SignUpActivity.this,MainActivity.class));

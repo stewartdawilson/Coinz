@@ -83,21 +83,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-
-
-
-
-
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
 
         btMenu = (Button) findViewById(R.id.btMenu);
         btMenu.setOnClickListener(this);
 
-        if (SignUpActivity.emailID != null) {
-            mainemail = SignUpActivity.emailID;
-        } else if(LoginActivity.emailID != null) {
+        if(LoginActivity.emailID != null) {
             mainemail = LoginActivity.emailID;
+            SignUpActivity.emailID = "";
+        } else if (SignUpActivity.emailID != null) {
+            mainemail = SignUpActivity.emailID;
+            LoginActivity.emailID = "";
         }
 
 

@@ -84,8 +84,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.getResult().getData().get("profile_image")!=null) {
-                    String profile_url = task.getResult().getData().get("profile_image").toString();
+                if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
+                    String profile_url = task.getResult().getData().get("user_image").toString();
 
 
                     FirebaseStorage storage = FirebaseStorage.getInstance();
