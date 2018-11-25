@@ -43,7 +43,7 @@
         app:layout_constraintTop_toBottomOf="@+id/userTradeID" />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/spinnerTrade"
         android:layout_width="119dp"
         android:layout_height="35dp"
         android:layout_marginBottom="8dp"

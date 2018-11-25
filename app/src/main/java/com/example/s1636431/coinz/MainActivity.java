@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.LifecycleOwner;
 import android.content.Intent;
 import android.graphics.Camera;
+import android.icu.text.DecimalFormat;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;

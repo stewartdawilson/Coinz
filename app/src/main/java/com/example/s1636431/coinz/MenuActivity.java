@@ -23,6 +23,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,6 +35,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     Button btBank;
     Button btPlay;
     Button btStat;
+
+
 
 
     @Override
@@ -53,6 +56,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         btBank.setOnClickListener(this);
         btPlay.setOnClickListener(this);
         btStat.setOnClickListener(this);
+
 
 
         Log.d("USER", MainActivity.mainemail);
@@ -100,10 +104,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                         public void onSuccess(byte[] bytes) {
                             ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
                             Bitmap bitmap;
-                            if ( inputStream !=null) {
-                                bitmap = BitmapFactory.decodeStream(inputStream);
-                                userProfile.setImageBitmap(bitmap);
-                            }
+                            bitmap = BitmapFactory.decodeStream(inputStream);
+                            userProfile.setImageBitmap(bitmap);
                         }
                     });
                 } else {

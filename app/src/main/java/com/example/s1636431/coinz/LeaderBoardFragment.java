@@ -22,6 +22,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +35,10 @@ public class LeaderBoardFragment extends Fragment {
     Spinner spinner;
     private List<String> spinnerData;
 
-    private ArrayList<HashMap<String, Object>> data = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> data = new ArrayList<>();
+    private ArrayAdapter<CharSequence> adapter;
+
+    LeaderBoardAdapter leaderBoardAdapter;
 
 
     @Nullable
@@ -54,22 +58,29 @@ public class LeaderBoardFragment extends Fragment {
                 String criteria = parent.getItemAtPosition(pos).toString();
                 if(criteria.equals("Distance")) {
                     criteria = "distance";
+                    setLeaderBoard(criteria);
+
                 } else if(criteria.equals("Gold")) {
-                    criteria = "wallet";
+                    criteria = "gold_alltime";
+                    setLeaderBoard(criteria);
+
                 }
-                setLeaderBoard(criteria);
+
+
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                return;
 
             }
         });
+        Log.d(TAG, String.format("DATA: %s", data.toString()));
 
 
 
         leaderboard.setLayoutManager(new LinearLayoutManager(getContext()));
-        LeaderBoardAdapter leaderBoardAdapter = new LeaderBoardAdapter(getContext(), data);
+        leaderBoardAdapter = new LeaderBoardAdapter(getContext(), data);
 
         leaderboard.setAdapter(leaderBoardAdapter);
 
@@ -78,6 +89,9 @@ public class LeaderBoardFragment extends Fragment {
 
     private void setLeaderBoard(String criteria) {
         ArrayList<HashMap<String, String>> leaderboard_data = new ArrayList<>();
+        data.clear();
+        leaderboard_data.clear();
+
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query dRef = db.collection("User").orderBy(criteria);
@@ -85,15 +99,29 @@ public class LeaderBoardFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                Log.d(TAG, task.getResult().getDocuments().toArray().toString());
+
+                Log.d(TAG, task.getResult().getDocuments().toString());
+                Log.d(TAG, criteria);
                 List<DocumentSnapshot> users = task.getResult().getDocuments();
                 for(DocumentSnapshot user : users) {
-                    String email = user.getData().get("email").toString();
-                    Object dist = user.getData().get("distance");
-                    HashMap<String, Object> user_data = new HashMap<>();
-                    user_data.put(email, dist);
+                    String email = user.getId();
+                    Log.d(TAG, String.format("EMAIL: %s", email));
+
+                    HashMap<String, String> user_data = new HashMap<>();
+
+                    String value = user.getData().get(criteria).toString();
+                    user_data.put(email, value);
+
+                    Log.d(TAG, String.format("RANKING BY: %s", value));
+                    Log.d(TAG, "DATA " + user_data);
+
+                    leaderboard_data.add(user_data);
                     data.add(user_data);
                 }
+                Collections.reverse(data);
+                leaderBoardAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
+
             }
         });
 
@@ -102,7 +130,7 @@ public class LeaderBoardFragment extends Fragment {
 
     public void renderSpinner(Spinner spinner) {
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+        adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.options_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);

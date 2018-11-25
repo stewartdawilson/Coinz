@@ -1,7 +1,9 @@
 package com.example.s1636431.coinz;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.icu.text.DecimalFormat;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
@@ -23,16 +25,18 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import timber.log.Timber;
+
 public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.ViewHolder> {
 
     private LeaderBoardAdapter.ItemClickListener mClickListener;
-    private ArrayList<HashMap<String, Object>> mData;
+    private ArrayList<HashMap<String, String>> mData;
     private LayoutInflater layoutInflater;
     private Context context;
 
     private String TAG = "LeaderBoardAdapter";
 
-    LeaderBoardAdapter(Context context, ArrayList<HashMap<String, Object>> data) {
+    LeaderBoardAdapter(Context context, ArrayList<HashMap<String, String>> data) {
         this.context = context;
         this.mData = data;
         this.layoutInflater = LayoutInflater.from(context);
@@ -46,7 +50,23 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
     }
 
     @Override
+    @SuppressLint("DefaultLocale")
     public void onBindViewHolder(LeaderBoardAdapter.ViewHolder holder, int position) {
+        HashMap<String, String> user = mData.get(position);
+        Log.d(TAG,user.toString());
+
+        for ( String key : user.keySet() ) {
+            Log.d(TAG, Integer.toString(position+1));
+            holder.rank.setText(Integer.toString(position+1));
+            holder.user.setText(key);
+            Log.d(TAG, user.get(key));
+            String result = String.format("%.2f", Double.parseDouble(user.get(key)));
+            holder.criteria.setText(result);
+
+            Log.d(TAG,"Adding user: " + key + " to page: ");
+
+        }
+
 
 
     }

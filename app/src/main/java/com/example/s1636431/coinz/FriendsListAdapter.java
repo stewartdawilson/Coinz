@@ -26,6 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -108,7 +109,14 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
             holder.btTrade.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(new Intent(context,TradeActivity.class));
+                    Intent intent = new Intent(context,TradeActivity.class);
+
+                    ByteArrayOutputStream _bs = new ByteArrayOutputStream();
+                    image.compress(Bitmap.CompressFormat.PNG, 50, _bs);
+                    intent.putExtra("byteArray", _bs.toByteArray());
+                    intent.putExtra("email", key);
+                    context.startActivity(intent);
+
                 }
             });
 
