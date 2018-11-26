@@ -7,4 +7,6 @@
     <string name="menu">MENU</string>
     <string name="trade">Trade</string>
     <string name="trade_coinz_below">Trade Coinzbelow!</string>
+    <string name="number_of_coinz_you_wish_to_trade">Number of coinz you wish to trade:</string>
+    <string name="number_of_coins_you_wish_to_bank">Number of coins you wish to bank</string>
 </resources>

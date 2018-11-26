@@ -111,6 +111,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             ArrayList<HashMap<String, String>> friends =  new ArrayList<>();
                             Double distance = 0.0;
                             Double gold = 0.0;
+                            Integer bank = 0;
+                            Integer coins_collected = 0;
+                            Integer amount_banked = 0;
                             String user_image = "";
 
                             data.put("wallet", wallet);
@@ -119,6 +122,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             data.put("user_image", user_image);
                             data.put("distance", distance);
                             data.put("gold_alltime", gold);
+                            data.put("bank", bank);
+                            data.put("amount_banked", amount_banked);
+                            data.put("coins_collected", coins_collected);
 
 
                             dRef.set(data, SetOptions.merge());

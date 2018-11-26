@@ -1,5 +1,6 @@
 package com.example.s1636431.coinz;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -106,10 +107,53 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                 }
             });
 
+            holder.ebtRemoveUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+                    dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            Boolean is_friend = false;
+                            HashMap<String, Object> friends_data = new HashMap<>();
+                            ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
+                            Timber.tag(TAG).d(key);
+                            if(friends!=null) {
+                                if(!friends.isEmpty()) {
+                                    for(HashMap<String, String> friend : friends) {
+
+                                        if (Objects.equals(friend.get("email"), key)) {
+                                            is_friend = true;
+                                            friends.remove(friend);
+                                            friends_data.put("friends", friends);
+                                            dRef.update(friends_data);
+                                            Toast.makeText(context, "Removed friend!", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        } else {
+                                            is_friend = false;
+                                        }
+                                    }
+                                    if(!is_friend) {
+                                        Toast.makeText(context, "User isn't friends with you already.", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                } else {
+                                    Toast.makeText(context, "You don't have any friends!", Toast.LENGTH_SHORT).show();
+
+                                }
+                            }
+                        }
+                    });
+
+                }
+            });
+
             holder.btTrade.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context,TradeActivity.class);
+                    Intent intent = new Intent(context, TradeActivity.class);
 
                     ByteArrayOutputStream _bs = new ByteArrayOutputStream();
                     image.compress(Bitmap.CompressFormat.PNG, 50, _bs);
@@ -135,7 +179,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView email;
         ImageView friendImage;
-        FloatingActionButton ebtAddUser;
+        FloatingActionButton ebtAddUser, ebtRemoveUser;
         Button btTrade;
 
 
@@ -144,6 +188,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
             email = userView.findViewById(R.id.txEmailRow);
             friendImage = userView.findViewById(R.id.friendImage);
             ebtAddUser = userView.findViewById(R.id.abtAddfriend);
+            ebtRemoveUser = userView.findViewById(R.id.abtRemovefriend);
             btTrade = userView.findViewById(R.id.btTrade);
             itemView.setOnClickListener(this);
         }

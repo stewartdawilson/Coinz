@@ -80,8 +80,6 @@ public class ProfilePageFragment extends Fragment {
                 } else {
                     userProfile.setImageDrawable(getContext().getDrawable(R.drawable.ic_user));
                 }
-
-
             }
         });
 

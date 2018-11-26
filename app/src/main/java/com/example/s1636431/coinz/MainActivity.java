@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static public ArrayList<String> collected = new ArrayList<>();
     static public Object wallet_data = new Object();
     static public String mainemail;
+    static public String bank_amount;
 
 
     Button btMenu;
@@ -219,8 +220,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public boolean checkCoinDistance(Location location) {
 
-
-
         if (MapMarkers.markers.equals(null)) {
             return false;
         } else {
@@ -230,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
+                    bank_amount = task.getResult().getData().get("bank").toString();
 
                     wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
                     collected = (ArrayList<String>) task.getResult().getData().get("collected");
