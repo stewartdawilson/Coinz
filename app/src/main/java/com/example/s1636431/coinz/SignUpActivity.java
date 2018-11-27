@@ -29,7 +29,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
 
     private FirebaseAuth mAuth;
-    EditText etEmail, etPass;
+    EditText etEmail, etPass, etHeight, etWeight;
     Button btSignUp;
     Button btAlreadyAccount;
 
@@ -47,6 +47,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         etEmail = (EditText) findViewById(R.id.etRemail);
         etPass = (EditText) findViewById(R.id.etRpass);
+        etHeight = (EditText) findViewById(R.id.etRheight);
+        etWeight = (EditText) findViewById(R.id.etRweight);
 
         btSignUp = (Button) findViewById(R.id.btSignUp);
         btAlreadyAccount = (Button) findViewById(R.id.btAlreadyAccount);
@@ -69,6 +71,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     public void createAccount() {
         String email = etEmail.getText().toString().trim();
         String password = etPass.getText().toString().trim();
+        String height_text = etHeight.getText().toString().trim();
+        String weight_text = etWeight.getText().toString().trim();
 
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
@@ -114,7 +118,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             Integer bank = 0;
                             Integer coins_collected = 0;
                             Integer amount_banked = 0;
+                            Double height= Double.parseDouble(height_text);
+                            Integer weight = Integer.parseInt(weight_text);
                             String user_image = "";
+
 
                             data.put("wallet", wallet);
                             data.put("collected", collected);
@@ -123,6 +130,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             data.put("distance", distance);
                             data.put("gold_alltime", gold);
                             data.put("bank", bank);
+                            data.put("weight", weight);
+                            data.put("height", height);
                             data.put("amount_banked", amount_banked);
                             data.put("coins_collected", coins_collected);
 

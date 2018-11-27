@@ -49,7 +49,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    TextView textUser, textWallet;
+    TextView textUser, textBank;
     ImageView userProfile;
     Button btCommunity;
     Button btBank;
@@ -65,7 +65,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_menu);
 
         textUser = (TextView) findViewById(R.id.userID);
-        textWallet = (TextView) findViewById(R.id.walletID);
+        textBank = (TextView) findViewById(R.id.bankID);
 
         btCommunity = (Button) findViewById(R.id.btCommunity);
         btBank = (Button) findViewById(R.id.btBank);
@@ -82,7 +82,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("USER", MainActivity.mainemail);
         textUser.setText(MainActivity.mainemail);
         // Got from stack overflow
-        textWallet.setText("Bank: " + MainActivity.bank_amount + " Gold");
+        textBank.setText("Bank: " + MainActivity.bank_amount + " Gold");
         getProfilePicture();
     }
 
@@ -167,7 +167,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                                             data.put("wallet", wallet);
                                             dRef.update(data);
 
-                                            textWallet.setText("Bank: " + bank.toString() + " Gold");
+                                            textBank.setText("Bank: " + bank.toString() + " Gold");
 
                                         } else {
                                             Toast.makeText(MenuActivity.this, "Can't bank " + number + " coins because either amount is negative or number exceeds wallet size.",

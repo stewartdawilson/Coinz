@@ -8,6 +8,7 @@ import android.icu.text.DecimalFormat;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -68,9 +69,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location location;
     private Location originLocation;
     private Location last_location;
+    private Long startTime = 0L;
+    private Boolean timetrial = false;
 
     static public List<Coinz> walletList = new ArrayList<Coinz>();
-    //static public double wallet;
     static public HashMap<String, Double> wallet = new HashMap<>();
     static public ArrayList<String> collected = new ArrayList<>();
     static public Object wallet_data = new Object();
@@ -78,7 +80,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static public String bank_amount;
 
 
+
     Button btMenu;
+    FloatingActionButton btTime;
 
 
     @Override
@@ -92,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         btMenu = (Button) findViewById(R.id.btMenu);
+        btTime = (FloatingActionButton) findViewById(R.id.btTimeTrial);
+        btTime.setOnClickListener(this);
         btMenu.setOnClickListener(this);
 
         if(LoginActivity.loggedIn) {
@@ -113,9 +119,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onClick(View view) {
         if(view==btMenu) {
             startActivity(new Intent(MainActivity.this,MenuActivity.class));
+        } else if(view==btTime) {
+            startTimeTrial();
         }
     }
 
+    private void startTimeTrial() {
+        startTime = System.currentTimeMillis();
+        timetrial = true;
+    }
 
 
     @Override
@@ -241,6 +253,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
 
+                            if(System.currentTimeMillis()>(startTime+30000)){
+                                timetrial=false;
+                            }
+
                             Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
                             Log.d("TEST", MapMarkers.markers.get(i).getTitle());
 
@@ -251,7 +267,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             try {
                                 Double rate = MapMarkers.rates.getDouble(name);
                                 Log.d("ADDING GOLD", "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
-                                wallet.put(id_fc, value * rate);
+                                if(timetrial) {
+                                    wallet.put(id_fc, 2*(value * rate));
+                                } else {
+                                    wallet.put(id_fc, (value * rate));
+                                }
                                 Log.d("WALLET AMOUNT", wallet.toString());
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -271,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Double old_dist = task.getResult().getDouble("distance");
                     Double new_dist = dist+old_dist;
 
-                    Long gold = Math.round(MainActivity.wallet.values().stream().mapToDouble(Number::doubleValue).sum());
+                    Long gold = Math.round(MainActivity.wallet.values().stream().mapToDouble(Number::doubleValue).sum())+ Long.valueOf(bank_amount);
                     data.put("gold_alltime", gold);
                     data.put("distance", new_dist);
                     data.put("wallet", wallet);
