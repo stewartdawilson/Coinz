@@ -18,7 +18,7 @@
         android:background="@drawable/shapeemail"
         android:drawableLeft="@drawable/ic_height"
         android:drawablePadding="10dp"
-        android:hint="Height"
+        android:hint="@string/height"
         android:inputType="numberDecimal"
         android:padding="15dp"
         android:textColor="@color/white"
@@ -38,7 +38,7 @@
         android:background="@drawable/shapeemail"
         android:drawableLeft="@drawable/ic_weight"
         android:drawablePadding="10dp"
-        android:hint="Weight"
+        android:hint="@string/weight"
         android:inputType="number"
         android:padding="15dp"
         android:textColor="@color/white"
@@ -59,7 +59,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
 
     <EditText
         android:id="@+id/etRemail"
@@ -71,7 +72,7 @@
         android:background="@drawable/shapeemail"
         android:drawableLeft="@drawable/ic_person_black_24dp"
         android:drawablePadding="10dp"
-        android:hint="Email"
+        android:hint="@string/email"
         android:inputType="textEmailAddress"
         android:padding="15dp"
         android:textColor="@color/white"
@@ -91,7 +92,7 @@
         android:background="@drawable/shapeemail"
         android:drawableLeft="@drawable/ic_lock_black_24dp"
         android:drawablePadding="10dp"
-        android:hint="Password"
+        android:hint="@string/password"
         android:inputType="textPassword"
         android:padding="15dp"
         android:textColor="@color/white"
@@ -112,7 +113,7 @@
         android:background="@drawable/shapelogin"
         android:padding="15dp"
         android:shadowColor="@android:color/transparent"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etRheight" />
@@ -128,7 +129,7 @@
         android:background="@drawable/shapesignup"
         android:padding="15dp"
         android:shadowColor="@android:color/transparent"
-        android:text="Already have an account?"
+        android:text="@string/already_have_an_account"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.s1636431.coinz"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -53,6 +53,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:17.1.2';
     implementation 'com.google.firebase:firebase-storage:16.0.5'
     implementation 'com.firebaseui:firebase-ui-database:4.2.1'
+    implementation 'joda-time:joda-time:2.9.4'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

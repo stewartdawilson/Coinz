@@ -4,14 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MenuActivity">
-
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="48dp">
+    tools:context=".MenuActivity"
+    android:id="@+id/linearLayout"
+    tools:layout_editor_absoluteX="16dp"
+    tools:layout_editor_absoluteY="48dp">
 
         <Button
             android:id="@+id/btBank"
@@ -21,7 +17,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/shapelogin"
-            android:text="Bank"
+            android:text="@string/bank"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.505"
@@ -45,7 +41,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/shapelogin"
-            android:text="Community"
+            android:text="@string/community"
             app:layout_constraintBottom_toTopOf="@+id/btBank"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.505"
@@ -59,7 +55,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/shapelogin"
-            android:text="Play!"
+            android:text="@string/play"
             app:layout_constraintBottom_toTopOf="@+id/btStat"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.505"
@@ -73,7 +69,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/shapelogin"
-            android:text="Statistics"
+            android:text="@string/stats"
             app:layout_constraintBottom_toTopOf="@+id/btCommunity"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.505"
@@ -105,5 +101,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bankID" />
 
-    </android.support.constraint.ConstraintLayout>
+
 </android.support.constraint.ConstraintLayout>

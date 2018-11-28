@@ -2,18 +2,16 @@ package com.example.s1636431.coinz;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -51,6 +49,8 @@ public class ProfilePageFragment extends Fragment {
 
     public void getProfilePicture(View view) {
         userProfile = (ImageView) view.findViewById(R.id.userProfileImage);
+
+        Log.d(TAG, "On profile page");
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);

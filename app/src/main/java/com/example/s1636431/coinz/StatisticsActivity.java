@@ -7,19 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
-
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import static java.lang.String.format;
 
 public class StatisticsActivity extends AppCompatActivity {
@@ -27,17 +21,21 @@ public class StatisticsActivity extends AppCompatActivity {
 
 
 
-    final static double walkingFactor = 0.57;
-    static double caloriesBurnedPerMile;
-    static double step_size;
-    static double stepsCount;
-    static double stepCountMile; // step/mile
-    static double conversationFactor;
-    static double caloriesBurnt;
-    static NumberFormat formatter = new DecimalFormat("#0.00");
+    private final static double walkingFactor = 0.57;
+    private static double caloriesBurnedPerMile;
+    private static double stepsCount;
+    private static double stepCountMile; // step/mile
+    private static double conversationFactor;
+    private static double caloriesBurnt;
+    private static NumberFormat formatter = new DecimalFormat("#0.00");
 
 
-    TextView txtCalories, txtFriends, txtSteps, txtDistance, txtGold, txtEmail;
+    private TextView txtCalories;
+    private TextView txtFriends;
+    private TextView txtSteps;
+    private TextView txtDistance;
+    private TextView txtGold;
+    private TextView txtEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

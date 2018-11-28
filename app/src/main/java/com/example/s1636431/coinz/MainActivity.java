@@ -1,12 +1,8 @@
 package com.example.s1636431.coinz;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.LifecycleOwner;
 import android.content.Intent;
-import android.graphics.Camera;
-import android.icu.text.DecimalFormat;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -30,8 +27,6 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -43,30 +38,22 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener, View.OnClickListener  {
 
-    private String tag = "MainActivity";
+    private String TAG = "MainActivity";
     private MapView mapView;
     private MapboxMap map;
     private PermissionsManager permissionsManager;
     private LocationEngine locationEngine;
     private LocationLayerPlugin locationLayerPlugin;
-    private Location location;
     private Location originLocation;
     private Location last_location;
     private Long startTime = 0L;
@@ -78,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static public Object wallet_data = new Object();
     static public String mainemail;
     static public String bank_amount;
+    static public Long coins_collected;
 
 
 
@@ -120,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(view==btMenu) {
             startActivity(new Intent(MainActivity.this,MenuActivity.class));
         } else if(view==btTime) {
+            Toast.makeText(MainActivity.this, "Time trial started!",
+                    Toast.LENGTH_LONG).show();
             startTimeTrial();
         }
     }
@@ -131,18 +121,57 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     @Override
+    @SuppressLint("SimpleDateFormat")
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
         wipeMap(map);
 
-        Date date = new Date();
-        String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(date);
-        String mapURL = "https://raw.githubusercontent.com/hhowley/JSON_Test/master/appleton.geojson";
-        Log.d("TEST", mapURL);
-        DownloadFileTask downloadTask = new DownloadFileTask(map, this);
-        downloadTask.execute(mapURL);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+        dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                String date_db = Objects.requireNonNull(task.getResult()).getString("last_login");
+                Date current_date = new Date();
+                String date_text = new SimpleDateFormat("yyyy/MM/dd").format(current_date);
 
-        enableLocation();
+                if (date_db != null) {
+                    if(date_db.equals(date_text)) {
+                        String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/" + date_db + "/coinzmap.geojson";
+                        Log.d(TAG, mapURL);
+                        DownloadFileTask downloadTask = new DownloadFileTask(map, MainActivity.this);
+                        downloadTask.execute(mapURL);
+                        enableLocation();
+                    } else {
+
+                        Map<String, Object> data = new HashMap<>();
+                        HashMap<String, Double> wallet;
+                        wallet = new HashMap<>();
+                        ArrayList<String> collected;
+                        collected = new ArrayList<>();
+                        Date last_login = new Date();
+                        String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(last_login);
+
+
+                        data.put("wallet", wallet);
+                        data.put("collected", collected);
+                        data.put("last_login", modifiedDate);
+
+
+                        dRef.set(data, SetOptions.merge());
+
+                        String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/" + modifiedDate + "/coinzmap.geojson";
+                        Log.d(TAG, mapURL);
+                        DownloadFileTask downloadTask = new DownloadFileTask(map, MainActivity.this);
+                        downloadTask.execute(mapURL);
+                        enableLocation();
+                    }
+                }
+
+
+            }
+        });
+
     }
 
     private void wipeMap(MapboxMap map) {
@@ -198,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("TEST", "WORK YOU PIECE OF SHIT");
+        Log.d(TAG, "Location changed");
         if (location != null) {
             if(originLocation != null) {
                 last_location = originLocation;
@@ -212,6 +241,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /*
+    Taken from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula, to calculate distance
+     */
+
     private double calculateDistance(Location location_now,Location location_prev) {
         final int R = 6371;
         // Radius of the earth in km
@@ -220,9 +253,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double dLon = deg2rad(location_prev.getLongitude() - location_now.getLongitude());
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(location_now.getLatitude())) * Math.cos(deg2rad(location_prev.getLatitude())) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double d = R * c;
         // Distance in km
-        return d;
+        return R*c;
     }
 
     private double deg2rad(double deg) {
@@ -230,10 +262,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public boolean checkCoinDistance(Location location) {
+    public void checkCoinDistance(Location location) {
 
-        if (MapMarkers.markers.equals(null)) {
-            return false;
+        if (MapMarkers.markers.isEmpty()) {
+
         } else {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference dRef = db.collection("User").document(mainemail);
@@ -245,61 +277,69 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
                     collected = (ArrayList<String>) task.getResult().getData().get("collected");
+                    coins_collected = (Long) task.getResult().getData().get("coins_collected");
 
-                    Log.d("WALLET", wallet_data.toString());
+                    Log.d(TAG, String.format("Wallet: %s", wallet_data.toString()));
 
                     Map<String, Object> data = new HashMap<>();
                     for (int i = 0; i < MapMarkers.markers.size(); i++) {
 
                         if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
 
-                            if(System.currentTimeMillis()>(startTime+30000)){
+                            if(System.currentTimeMillis()>(startTime+30000)&&timetrial){
                                 timetrial=false;
+                                Toast.makeText(MainActivity.this, "Time trial over!",
+                                        Toast.LENGTH_LONG).show();
                             }
 
                             Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
-                            Log.d("TEST", MapMarkers.markers.get(i).getTitle());
+                            Log.d(TAG, MapMarkers.markers.get(i).getTitle());
 
                             Double value = fc.properties().get("value").getAsDouble();
                             String name = fc.properties().get("currency").getAsString();
                             String id_fc = fc.properties().get("id").getAsString();
-                            Log.d("TESTING NAME", name);
+                            Log.d(TAG, name);
                             try {
                                 Double rate = MapMarkers.rates.getDouble(name);
-                                Log.d("ADDING GOLD", "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
+                                Log.d(TAG, "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
                                 if(timetrial) {
                                     wallet.put(id_fc, 2*(value * rate));
                                 } else {
                                     wallet.put(id_fc, (value * rate));
                                 }
-                                Log.d("WALLET AMOUNT", wallet.toString());
+                                Log.d(TAG, wallet.toString());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
                             Coinz coin = new Coinz(name, value, MainActivity.this);
                             walletList.add(coin);
-                            Log.d("Adding coinz to wallet", coin.toString());
+                            Log.d(TAG, coin.toString());
                             collected.add(fc.properties().get("id").getAsString());
                             map.removeMarker(MapMarkers.markers.get(i).getMarker());
                             MapMarkers.markers.remove(i);
+                            coins_collected++;
+
 
                         }
 
                     }
                     Double dist = calculateDistance(originLocation, last_location);
                     Double old_dist = task.getResult().getDouble("distance");
-                    Double new_dist = dist+old_dist;
+                    if(old_dist!=null) {
+                        Double new_dist = dist+old_dist;
+                        Long gold = Math.round(MainActivity.wallet.values().stream().mapToDouble(Number::doubleValue).sum())+ Long.valueOf(bank_amount);
+                        data.put("gold_alltime", gold);
+                        data.put("distance", new_dist);
+                        data.put("wallet", wallet);
+                        data.put("collected", collected);
+                        data.put("coins_collected", coins_collected);
+                        dRef.set(data, SetOptions.merge());
+                    }
 
-                    Long gold = Math.round(MainActivity.wallet.values().stream().mapToDouble(Number::doubleValue).sum())+ Long.valueOf(bank_amount);
-                    data.put("gold_alltime", gold);
-                    data.put("distance", new_dist);
-                    data.put("wallet", wallet);
-                    data.put("collected", collected);
-                    dRef.set(data, SetOptions.merge());
+
                 }
             });
-            return true;
         }
     }
 
@@ -313,13 +353,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (granted) {
             enableLocation();
         } else {
-            Log.d("UPDATE","permission not granted");
+            Log.d(TAG,"UPDATE: permission not granted");
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d("UPDATE","Got permssion");
+        Log.d(TAG,"UPDATE: Got permssion");
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 

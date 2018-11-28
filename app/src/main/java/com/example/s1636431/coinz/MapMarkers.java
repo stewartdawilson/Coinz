@@ -11,28 +11,22 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +46,7 @@ public class MapMarkers {
 
     public static JSONObject rates;
 
-    public boolean taken;
+    private boolean taken;
 
     public MapMarkers(MapboxMap map, Activity activity, String result) {
         this.map = map;
@@ -73,6 +67,7 @@ public class MapMarkers {
              @Override
              public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                  ArrayList<String> collected = (ArrayList<String>) task.getResult().getData().get("collected");
+                 Log.d("RESULT", result);
                  FeatureCollection featureCollection = FeatureCollection.fromJson(result);
 
                  try {

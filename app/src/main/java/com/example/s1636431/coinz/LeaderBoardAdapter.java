@@ -2,42 +2,26 @@ package com.example.s1636431.coinz;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.icu.text.DecimalFormat;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
-import timber.log.Timber;
 
 public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.ViewHolder> {
 
     private LeaderBoardAdapter.ItemClickListener mClickListener;
     private ArrayList<HashMap<String, String>> mData;
     private LayoutInflater layoutInflater;
-    private Context context;
 
-    private String TAG = "LeaderBoardAdapter";
+    private final String TAG = "LeaderBoardAdapter";
 
     LeaderBoardAdapter(Context context, ArrayList<HashMap<String, String>> data) {
-        this.context = context;
         this.mData = data;
         this.layoutInflater = LayoutInflater.from(context);
     }
@@ -50,7 +34,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
     }
 
     @Override
-    @SuppressLint("DefaultLocale")
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     public void onBindViewHolder(LeaderBoardAdapter.ViewHolder holder, int position) {
         HashMap<String, String> user = mData.get(position);
         Log.d(TAG,user.toString());
@@ -60,7 +44,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             holder.rank.setText(Integer.toString(position+1));
             holder.user.setText(key);
             Log.d(TAG, user.get(key));
-            String result = String.format("%.2f", Double.parseDouble(user.get(key)));
+            String result = String.format("%.2f", Double.parseDouble(Objects.requireNonNull(user.get(key))));
             holder.criteria.setText(result);
 
             Log.d(TAG,"Adding user: " + key + " to page: ");

@@ -10,30 +10,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.mapbox.geojson.Feature;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-
-import org.json.JSONException;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,8 +41,6 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
     private int number;
     private Double trade_amount = 0.0;
     private Long trade_amount_final;
-    private List<String> spinnerData;
-    private ArrayAdapter<CharSequence> adapter;
 
 
     @Override

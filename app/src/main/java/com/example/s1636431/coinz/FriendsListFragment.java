@@ -1,59 +1,40 @@
 package com.example.s1636431.coinz;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SearchView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
-
-import org.json.JSONException;
-
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
-
 import timber.log.Timber;
 
 
 public class FriendsListFragment extends Fragment {
 
     private static final String TAG = "FriendsListFragment";
-    private FirebaseAuth mAuth;
 
     SearchView search_list;
 
@@ -88,9 +69,13 @@ public class FriendsListFragment extends Fragment {
         search_list.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                search_user(query, getContext());
-                search_list.clearFocus();
-                return false;
+                if ( query.equals(MainActivity.mainemail)) {
+                    return false;
+                } else {
+                    search_user(query, getContext());
+                    search_list.clearFocus();
+                    return false;
+                }
             }
 
             @Override
@@ -188,7 +173,7 @@ public class FriendsListFragment extends Fragment {
      https://stackoverflow.com/questions/3035692/how-to-convert-a-drawable-to-a-bitmap
      */
     public static Bitmap drawableToBitmap (Drawable drawable) {
-        Bitmap bitmap = null;
+        Bitmap bitmap;
 
         if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
             bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel

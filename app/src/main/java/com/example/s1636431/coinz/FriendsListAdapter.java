@@ -1,41 +1,30 @@
 package com.example.s1636431.coinz;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Set;
-
 import timber.log.Timber;
 
-import static android.support.constraint.Constraints.TAG;
 
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.ViewHolder> {
 
@@ -80,7 +69,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                             ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
                             Timber.tag(TAG).d(key);
                             if(friends!=null) {
-                                if (friends.isEmpty() || FriendsListFragment.searched_user.equals(MainActivity.mainemail)) {
+                                if (friends.isEmpty()) {
                                     friends_data.put("friends", FriendsListFragment.searched_user);
                                     dRef.set(friends_data, SetOptions.merge());
                                     Toast.makeText(context, "Added as friend!", Toast.LENGTH_SHORT).show();
@@ -88,7 +77,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                                 for(HashMap<String, String> friend : friends) {
 
                                     FriendsListFragment.searched_user.add(friend);
-                                    if (!Objects.equals(friend.get("email"), key) || FriendsListFragment.searched_user.equals(MainActivity.mainemail)) {
+                                    if (!Objects.equals(friend.get("email"), key)) {
                                         not_friend = true;
                                     } else {
                                         not_friend = false;

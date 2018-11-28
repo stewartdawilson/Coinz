@@ -1,5 +1,5 @@
-<resources>
-    <string name="app_name">Coinz</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" tools:ignore="PrivateResource">Coinz</string>
     <string name="access_token">pk.eyJ1Ijoid2lsc29uc2ZjIiwiYSI6ImNqbjNjYzJ3bjBkazAzcW15YXkzbGNmN3oifQ.FL-v4Yb-J8rEFQhRY2KCSw</string>
     <string name="title_activity_community">CommunityActivity</string>
     <string name="action_settings">Settings</string>
@@ -9,4 +9,17 @@
     <string name="trade_coinz_below">Trade Coinzbelow!</string>
     <string name="number_of_coinz_you_wish_to_trade">Number of coinz you wish to trade:</string>
     <string name="number_of_coins_you_wish_to_bank">Number of coins you wish to bank</string>
+    <string name="height">Height</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="weight">Weight</string>
+    <string name="statistics">Statistics:</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="log_in">Log In</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="bank">Bank</string>
+    <string name="community">Community</string>
+    <string name="play">Play!</string>
+    <string name="stats">Statistics</string>
 </resources>

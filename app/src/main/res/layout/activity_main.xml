@@ -30,7 +30,8 @@
         mapbox:mapbox_cameraZoom="12"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
         tools:layout_editor_absoluteX="37dp"
-        tools:layout_editor_absoluteY="52dp">
+        tools:layout_editor_absoluteY="52dp"
+        tools:ignore="MissingConstraints">
 
         <Button
             android:id="@+id/btMenu"

@@ -1,7 +1,6 @@
 package com.example.s1636431.coinz;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -10,20 +9,27 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth mAuth;
 
-    EditText etEmail, etPass;
-    Button btLogin;
-    Button btCreateAccount;
+    private EditText etEmail;
+    private EditText etPass;
+    private Button btLogin;
+    private Button btCreateAccount;
 
     static public String emailID;
     static public Boolean loggedIn;
@@ -56,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public void loginIn() {
+    private void loginIn() {
 
         String email = etEmail.getText().toString().trim();
         String password = etPass.getText().toString().trim();
@@ -86,10 +92,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("SIGN IN", "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
                             emailID = email;
                             loggedIn = true;
                             SignUpActivity.signedIn = false;
+
+
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            DocumentReference dRef = db.collection("User").document(email);
+
+                            Map<String, Object> data = new HashMap<>();
+                            Date last_login = new Date();
+                            String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(last_login);
+
+
+                            data.put("last_login", modifiedDate);
+
+
+                            dRef.set(data, SetOptions.merge());
                             startActivity(new Intent(LoginActivity.this,MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.

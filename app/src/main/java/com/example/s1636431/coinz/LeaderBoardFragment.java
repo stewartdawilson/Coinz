@@ -31,14 +31,13 @@ public class LeaderBoardFragment extends Fragment {
 
     private static final String TAG = "LeaderBoardFragment";
 
-    RecyclerView leaderboard;
-    Spinner spinner;
-    private List<String> spinnerData;
+    private RecyclerView leaderboard;
+    private Spinner spinner;
 
     private ArrayList<HashMap<String, String>> data = new ArrayList<>();
     private ArrayAdapter<CharSequence> adapter;
 
-    LeaderBoardAdapter leaderBoardAdapter;
+    private LeaderBoardAdapter leaderBoardAdapter;
 
 
     @Nullable
