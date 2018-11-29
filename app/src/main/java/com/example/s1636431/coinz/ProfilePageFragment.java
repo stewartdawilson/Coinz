@@ -47,16 +47,21 @@ public class ProfilePageFragment extends Fragment {
         return view;
     }
 
+    /*
+      Function responsible for getting the users profile image.
+   */
     public void getProfilePicture(View view) {
         userProfile = (ImageView) view.findViewById(R.id.userProfileImage);
 
         Log.d(TAG, "On profile page");
 
+        // Make call to firebase to get user info.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                // Check if user has a profile picture, otherwise set default image
                 if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
                     String profile_url = task.getResult().getData().get("user_image").toString();
 
@@ -68,6 +73,7 @@ public class ProfilePageFragment extends Fragment {
 
                     final long one_megabyte = 1024*1024;
 
+                    // Downloads the image on firestore and puts it into a bitmap
                     path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {

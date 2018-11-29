@@ -143,10 +143,6 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, TradeActivity.class);
-
-                    ByteArrayOutputStream _bs = new ByteArrayOutputStream();
-                    image.compress(Bitmap.CompressFormat.PNG, 50, _bs);
-                    intent.putExtra("byteArray", _bs.toByteArray());
                     intent.putExtra("email", key);
                     context.startActivity(intent);
 

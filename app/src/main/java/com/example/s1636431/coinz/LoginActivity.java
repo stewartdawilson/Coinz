@@ -67,18 +67,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String email = etEmail.getText().toString().trim();
         String password = etPass.getText().toString().trim();
 
+        // Make sure emails not empty
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
             return;
         }
 
+        // Make sure passwords not empty
         if (password.isEmpty()) {
             etPass.setError("Password is required");
             etPass.requestFocus();
             return;
         }
 
+        // Make sure passwords length is at least 6
         if (password.length() < 6) {
             etPass.setError("Minimum length of password should be 6");
             etPass.requestFocus();
@@ -90,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Sign in success, update last login date on firebase and start main activity.
                             Log.d("SIGN IN", "signInWithEmail:success");
                             emailID = email;
                             loggedIn = true;

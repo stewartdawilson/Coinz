@@ -22,10 +22,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
 
     private final static double walkingFactor = 0.57;
-    private static double caloriesBurnedPerMile;
     private static double stepsCount;
-    private static double stepCountMile; // step/mile
-    private static double conversationFactor;
     private static double caloriesBurnt;
     private static NumberFormat formatter = new DecimalFormat("#0.00");
 
@@ -36,6 +33,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private TextView txtDistance;
     private TextView txtGold;
     private TextView txtEmail;
+    private TextView txtCoins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +41,7 @@ public class StatisticsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_statistics);
         getData();
 
+        txtCoins =  (TextView) findViewById(R.id.txtCoinsCollected);
         txtCalories = (TextView) findViewById(R.id.txtCaloriesStats);
         txtDistance = (TextView) findViewById(R.id.txtDistanceStats);
         txtEmail = (TextView) findViewById(R.id.txtEmailStats);
@@ -69,19 +68,19 @@ public class StatisticsActivity extends AppCompatActivity {
                 String gold_alltime = task.getResult().getData().get("gold_alltime").toString();
                 String weight = task.getResult().getData().get("weight").toString();
                 String height = task.getResult().getData().get("height").toString();
+                String coins_collected = task.getResult().getData().get("coins_collected").toString();
 
                 caloriesBurned(weight, height, distance);
 
 
+                // Display all the stats
                 txtDistance.setText(format("Total distance travelled (km): %s", formatter.format(distance)));
                 txtEmail.setText(String.format("Email: %s", email));
                 txtFriends.setText(String.format("Total number of friends: %s",friends.size()));
                 txtSteps.setText(String.format("Total number of steps taken: %s", stepsCount));
                 txtGold.setText(String.format("Overall Gold collected: %s", gold_alltime));
                 txtCalories.setText(format("Total number of calories burnt: %s", formatter.format(caloriesBurnt)));
-
-
-
+                txtCoins.setText(String.format("Total number of coinz collected: %s", coins_collected));
             }
         });
     }
@@ -89,7 +88,8 @@ public class StatisticsActivity extends AppCompatActivity {
 
 
     /*
-    Taken from https://fitness.stackexchange.com/questions/25472/how-to-calculate-calorie-from-pedometer and adapted using formula found online
+    Taken from https://fitness.stackexchange.com/questions/25472/how-to-calculate-calorie-from-pedometer and adapted using formula found online.
+    Calculates the calories burned for the user using his distance, weight and height.
      */
     public void caloriesBurned(String weight_text, String height_text, Double distance) {
 
@@ -113,12 +113,12 @@ public class StatisticsActivity extends AppCompatActivity {
         Log.d("FITBIT", Double.toString(stepsCount));
 
 
-        caloriesBurnedPerMile = walkingFactor * (weight * 2.2);
+        double caloriesBurnedPerMile = walkingFactor * (weight * 2.2);
 
 
-        stepCountMile = 5280/step_size_feet;
+        double stepCountMile = 5280 / step_size_feet;
 
-        conversationFactor = caloriesBurnedPerMile / stepCountMile;
+        double conversationFactor = caloriesBurnedPerMile / stepCountMile;
 
         caloriesBurnt = stepsCount * conversationFactor;
     }

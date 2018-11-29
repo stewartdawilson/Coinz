@@ -17,11 +17,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,12 +53,7 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trade);
 
-        if(getIntent().hasExtra("byteArray")) {
-            friendImage = (ImageView) findViewById(R.id.userTradeImage);
-            Bitmap _bitmap = BitmapFactory.decodeByteArray(
-                    getIntent().getByteArrayExtra("byteArray"),0,getIntent().getByteArrayExtra("byteArray").length);
-            friendImage.setImageBitmap(_bitmap);
-        }
+        getProfilePicture(getCurrentFocus());
 
         email = this.getIntent().getStringExtra("email");
 
@@ -61,8 +61,53 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
         txEmail.setText(email);
 
         btTrade =  (Button) findViewById(R.id.btTradePage);
-
         btTrade.setOnClickListener(this);
+
+
+    }
+
+    /*
+      Function responsible for getting the users profile image.
+   */
+    public void getProfilePicture(View view) {
+        friendImage = (ImageView) view.findViewById(R.id.userProfileImage);
+
+        Log.d(TAG, "On trade page");
+
+
+        // Make call to firebase to get user info.
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+        dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                // Check if user has a profile picture, otherwise set default image
+                if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
+                    String profile_url = task.getResult().getData().get("user_image").toString();
+
+
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageReference = storage.getReference();
+
+                    StorageReference path = storageReference.child(profile_url);
+
+                    final long one_megabyte = 1024*1024;
+
+                    // Downloads the image on firestore and puts it into a bitmap
+                    path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+                            Bitmap bitmap;
+                            bitmap = BitmapFactory.decodeStream(inputStream);
+                            friendImage.setImageBitmap(bitmap);
+                        }
+                    });
+                } else {
+                    friendImage.setImageDrawable(getDrawable(R.drawable.ic_user));
+                }
+            }
+        });
 
 
     }

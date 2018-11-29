@@ -1,5 +1,6 @@
 package com.example.s1636431.coinz;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -70,6 +71,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     public void createAccount() {
         String email = etEmail.getText().toString().trim();
         String password = etPass.getText().toString().trim();
@@ -141,7 +143,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
                             dRef.set(data, SetOptions.merge());
 
-                            startActivity(new Intent(SignUpActivity.this,MainActivity.class));
+                            startActivity(new Intent(SignUpActivity.this,TutorialActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("SIGN IN", "createUserWithEmail:failure", task.getException());

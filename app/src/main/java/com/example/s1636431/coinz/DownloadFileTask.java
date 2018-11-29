@@ -11,6 +11,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/*
+    This class is responsible for the downloading of the geojson file (the map). Once the onPostExecute is called
+    i.e. the download is finished, then its passed in the MapMarkers class which begins to populate the map.
+ */
 
 public class DownloadFileTask extends AsyncTask<String, Void, String> {
 
@@ -18,7 +22,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
     @SuppressLint("StaticFieldLeak")
     private Activity activity;
 
-    public DownloadFileTask(MapboxMap map, Activity activity) {
+    DownloadFileTask(MapboxMap map, Activity activity) {
         this.map = map;
         this.activity =  activity;
     }
@@ -53,7 +57,6 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
     @NonNull
     private String readStream(InputStream stream)
             throws IOException {
-
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }

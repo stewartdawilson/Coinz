@@ -79,7 +79,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.d("USER", MainActivity.mainemail);
         textUser.setText(MainActivity.mainemail);
-        // Got from stack overflow
         textBank.setText(String.format("Bank: %s Gold", MainActivity.bank_amount));
         getProfilePicture();
     }
@@ -99,6 +98,11 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    /*
+        Function responsible for bank submission. Uses a pop up dialog where the use enters the number of
+        coins he wishes to deposit.
+     */
     @SuppressLint("InflateParams")
     private void updateBank() {
 
@@ -119,6 +123,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                         EditText etBank = inflate_view.findViewById(R.id.etBank);
                         number = Integer.parseInt(etBank.getText().toString());
 
+                        // Make firebase call to get use info.
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
                         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -126,16 +131,20 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 Map<String, Object> data = new HashMap<>();
 
-
                                 HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
                                 Long amount_banked = (Long) task.getResult().getData().get("amount_banked");
 
                                 Log.d(TAG, wallet.toString());
+
+                                // Perform various checks. First check if the user wallet is empty, then check if the user has banked
+                                // 25 coins already, then check if number input by user is valid i.e. not negative or not over 25
                                 if (!wallet.isEmpty()) {
                                     if(amount_banked!=null){
                                         if (!(amount_banked>25)) {
-                                            if(number<=wallet.size() && number>=0) {
+                                            if(number<=wallet.size() && number>=0 && number<=25) {
 
+                                                // Sort wallet in descending order, so the user deposits
+                                                // the most valuable coins first.
                                                 Map<String, Double> sortedWallet = new LinkedHashMap<>();
                                                 wallet.entrySet()
                                                         .stream()
@@ -145,6 +154,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                                                 int count = 0;
                                                 bank_amount = 0.0;
                                                 bank_amount_final = 0L;
+                                                // Update bank amount and remove coin from wallet
                                                 for (String key : sortedWallet.keySet()) {
                                                     if(count==number) {
                                                         break;
@@ -162,6 +172,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
                                                 amount_banked = number.longValue();
 
+                                                // Update bank, amount_banked (number of coins deposited), and the users wallet on firebase
                                                 data.put("amount_banked", amount_banked);
                                                 data.put("bank", bank);
                                                 data.put("wallet", wallet);
@@ -189,14 +200,19 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 .show();
     }
 
+    /*
+       Function responsible for getting the users profile image.
+    */
     public void getProfilePicture() {
         userProfile = (ImageView) findViewById(R.id.userImage);
 
+        // Make call to firebase to get user info.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                // Check if user has a profile picture, otherwise set default image
                 if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
                     String profile_url = task.getResult().getData().get("user_image").toString();
 
@@ -208,6 +224,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
                     final long one_megabyte = 1024*1024;
 
+                    // Downloads the image on firestore and puts it into a bitmap
                     path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
