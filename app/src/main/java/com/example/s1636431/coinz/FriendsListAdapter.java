@@ -19,13 +19,16 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import timber.log.Timber;
 
-
+/*
+    Adapter for the friends list fragment. Responsible for displaying all the information on the page. Its given data
+    which is sent from the FriendsListFragment in the form of a ArrayList of Hashmaps which hold the friends email as the key
+    and the image as the value.
+ */
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.ViewHolder> {
 
     private ItemClickListener mClickListener;
@@ -49,16 +52,20 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     }
 
     @Override
+    // Function displays the data passed into the Adapter by the Fragment
     public void onBindViewHolder( ViewHolder holder, int position) {
         HashMap<String, Bitmap> user = mData.get(position);
 
+        // Iterates over each friend in the array and displays them on the friends list
         for ( String key : user.keySet() ) {
             Bitmap image = user.get(key);
             holder.friendImage.setImageBitmap(image);
             holder.email.setText(key);
+            // Set up Click listener for the add friend button
             holder.ebtAddUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // Get user info from firebase
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
                     dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -69,11 +76,13 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                             ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
                             Timber.tag(TAG).d(key);
                             if(friends!=null) {
+                                // If the player has no friends then add the user.
                                 if (friends.isEmpty()) {
                                     friends_data.put("friends", FriendsListFragment.searched_user);
                                     dRef.set(friends_data, SetOptions.merge());
                                     Toast.makeText(context, "Added as friend!", Toast.LENGTH_SHORT).show();
                                 }
+                                // Check to see if the player is already friends with user
                                 for(HashMap<String, String> friend : friends) {
 
                                     FriendsListFragment.searched_user.add(friend);
@@ -85,6 +94,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                                         break;
                                     }
                                 }
+                                // If not friends then add the user
                                 if(not_friend) {
                                     friends_data.put("friends", FriendsListFragment.searched_user);
                                     dRef.update(friends_data);
@@ -95,7 +105,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                     });
                 }
             });
-
+            // Set up Click listener for the remove friend button
             holder.ebtRemoveUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -110,7 +120,9 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                             ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
                             Timber.tag(TAG).d(key);
                             if(friends!=null) {
+                                // Check to see if the player has friends
                                 if(!friends.isEmpty()) {
+                                    // Iterate over every friend the player has and see if he's friends with the user
                                     for(HashMap<String, String> friend : friends) {
 
                                         if (Objects.equals(friend.get("email"), key)) {
@@ -124,8 +136,9 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                                             is_friend = false;
                                         }
                                     }
+                                    // If the user wasn't friends then display message
                                     if(!is_friend) {
-                                        Toast.makeText(context, "User isn't friends with you already.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, "User isn't friends with you.", Toast.LENGTH_SHORT).show();
                                     }
 
                                 } else {
@@ -139,12 +152,13 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
                 }
             });
 
+            // Set up Click listener for trading button
             holder.btTrade.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, TradeActivity.class);
-                    intent.putExtra("email", key);
-                    context.startActivity(intent);
+                    intent.putExtra("email", key); // Store the email of the user he wishes to trade with in the intent
+                    context.startActivity(intent); // Go to trading screen
 
                 }
             });

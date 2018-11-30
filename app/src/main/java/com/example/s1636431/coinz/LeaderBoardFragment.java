@@ -26,7 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-
+/*
+    Fragment for the leaderboard. Get's all the users of the app from firebase, then sends them to
+    the LeaderBoardAdapter to be displayed alongside their ranking for the specified criteria
+ */
 public class LeaderBoardFragment extends Fragment {
 
     private static final String TAG = "LeaderBoardFragment";
@@ -51,10 +54,12 @@ public class LeaderBoardFragment extends Fragment {
         spinner = (Spinner) view.findViewById(R.id.sorter);
         renderSpinner(spinner);
 
+        // Set up spinner item select listener
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String criteria = parent.getItemAtPosition(pos).toString();
+                // Checks what criteria the user has selected
                 if(criteria.equals("Distance")) {
                     criteria = "distance";
                     setLeaderBoard(criteria);
@@ -62,7 +67,6 @@ public class LeaderBoardFragment extends Fragment {
                 } else if(criteria.equals("Gold")) {
                     criteria = "gold_alltime";
                     setLeaderBoard(criteria);
-
                 }
 
 
@@ -86,12 +90,17 @@ public class LeaderBoardFragment extends Fragment {
         return view;
     }
 
+    /*
+        Function responsible for getting all the data needed to display the leaderboard for the selected
+        criteria.
+     */
     private void setLeaderBoard(String criteria) {
         ArrayList<HashMap<String, String>> leaderboard_data = new ArrayList<>();
         data.clear();
         leaderboard_data.clear();
 
 
+        // Get all the users ordered by the given criteria.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query dRef = db.collection("User").orderBy(criteria);
         dRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -102,6 +111,7 @@ public class LeaderBoardFragment extends Fragment {
                 Log.d(TAG, task.getResult().getDocuments().toString());
                 Log.d(TAG, criteria);
                 List<DocumentSnapshot> users = task.getResult().getDocuments();
+                // For each user add them to data alongside their criteria value
                 for(DocumentSnapshot user : users) {
                     String email = user.getId();
                     Log.d(TAG, String.format("EMAIL: %s", email));
@@ -117,7 +127,7 @@ public class LeaderBoardFragment extends Fragment {
                     leaderboard_data.add(user_data);
                     data.add(user_data);
                 }
-                Collections.reverse(data);
+                Collections.reverse(data); // reverse data so it's in decreasing order
                 leaderBoardAdapter.notifyDataSetChanged();
                 adapter.notifyDataSetChanged();
 
@@ -127,6 +137,7 @@ public class LeaderBoardFragment extends Fragment {
     }
 
 
+    // Adds the options to the spinner
     public void renderSpinner(Spinner spinner) {
 
         adapter = ArrayAdapter.createFromResource(getContext(),

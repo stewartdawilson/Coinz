@@ -24,7 +24,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/*
+    Sign up page activity, used when user first create an account.
+ */
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -38,8 +40,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     static public String emailID;
     static public Boolean signedIn;
-
-// in the onCreate method
 
 
     @Override
@@ -78,18 +78,34 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String height_text = etHeight.getText().toString().trim();
         String weight_text = etWeight.getText().toString().trim();
 
+        // Make sure emails not empty
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
             return;
         }
-
+        // Make sure passwords not empty
         if (password.isEmpty()) {
             etPass.setError("Password is required");
             etPass.requestFocus();
             return;
         }
 
+        // Make sure heights not empty
+        if (height_text.isEmpty()) {
+            etPass.setError("Weight is required");
+            etPass.requestFocus();
+            return;
+        }
+
+        // Make sure weights not empty
+        if (weight_text.isEmpty()) {
+            etPass.setError("Height is required");
+            etPass.requestFocus();
+            return;
+        }
+
+        // Make sure passwords length is at least 6
         if (password.length() < 6) {
             etPass.setError("Minimum length of password should be 6");
             etPass.requestFocus();
@@ -101,7 +117,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Sign in success, create new user in firebase with fields add initial values
                             Log.d("SIGN IN", "createUserWithEmail:success");
                             Toast.makeText(SignUpActivity.this, "Registration Successful",
                                     Toast.LENGTH_SHORT).show();
@@ -141,7 +157,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             data.put("coins_collected", coins_collected);
                             data.put("last_login", modifiedDate);
 
-                            dRef.set(data, SetOptions.merge());
+                            dRef.set(data, SetOptions.merge()); // Add user to firebase
 
                             startActivity(new Intent(SignUpActivity.this,TutorialActivity.class));
                         } else {

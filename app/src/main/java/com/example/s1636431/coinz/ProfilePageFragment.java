@@ -23,8 +23,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayInputStream;
-
-
+/*
+    Fragment for profile page, just displays the players profile picture and their email.
+ */
 public class ProfilePageFragment extends Fragment {
 
     private static final String TAG = "ProfilePageFragment";

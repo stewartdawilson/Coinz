@@ -58,6 +58,9 @@ public class MapMarkers {
 
 
 
+    /*
+        Function responsible for adding the coin markers to the map.
+     */
     public void addCoinz(String result, Activity activity, MapboxMap map) {
         markers.clear();
 
@@ -166,6 +169,11 @@ public class MapMarkers {
          });
     }
 
+
+    /*
+        Partly taken from https://stackoverflow.com/questions/37805379/mapbox-for-android-changing-color-of-a-markers-icon?fbclid=IwAR3P7KdX3IgMb6knCuQ9z7PEgK3-mN6NdAy5nNA38QUZ6LVzUWZnLNs6Hz8
+        Creates the icons using the color specified in the geojson. Then adds the number onto the icon.
+    */
     private Bitmap createIcons(Feature fc) {
         Drawable vectorDrawable = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.mapbox_marker_icon_default, activity.getTheme());
         Bitmap bitmap = Bitmap.createBitmap(Objects.requireNonNull(vectorDrawable).getIntrinsicWidth(),
@@ -181,7 +189,7 @@ public class MapMarkers {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(50);
         paint.setTypeface(Typeface.create("Arial",Typeface.BOLD));
-        canvas.drawText(Objects.requireNonNull(fc.properties()).get("marker-symbol").getAsString(), 25, 50, paint);
+        canvas.drawText(Objects.requireNonNull(fc.properties()).get("marker-symbol").getAsString(), 25, 50, paint); // add the number onto the icon
         return bitmap;
     }
 }

@@ -57,8 +57,8 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
     @NonNull
     private String readStream(InputStream stream)
             throws IOException {
-        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A"); // decodes the geojson file
+        return s.hasNext() ? s.next() : ""; // returns the geojson file in as a String
     }
 
     @Override
@@ -68,7 +68,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
         Log.d("RESULT", result);
         DownloadCompleteRunner.dowloadComplete(result);
         MapMarkers mapMarkers =  new MapMarkers(map,this.activity, result);
-        mapMarkers.addCoinz(result, this.activity, map);
+        mapMarkers.addCoinz(result, this.activity, map); // Once downloaded, add coinz to map
 
 
     }

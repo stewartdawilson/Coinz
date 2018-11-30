@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
+/*
+    Tutorial screen for new users of app.
+ */
 public class TutorialActivity extends AppCompatActivity {
 
     Button btContinue;

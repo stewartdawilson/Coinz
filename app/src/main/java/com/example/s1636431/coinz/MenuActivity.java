@@ -35,7 +35,10 @@ import java.util.Map;
 
 import static java.util.Comparator.reverseOrder;
 import static java.util.Map.Entry.comparingByValue;
-
+/*
+    Menu page for app. Has buttons that allow user to go back to map, bank gold from their wallet, go to the
+    community section, and go to stats screen.
+ */
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MenuActivity";
@@ -100,7 +103,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /*
-        Function responsible for bank submission. Uses a pop up dialog where the use enters the number of
+        Function responsible for bank submission. Uses a pop up dialog where the player enters the number of
         coins he wishes to deposit.
      */
     @SuppressLint("InflateParams")
@@ -123,7 +126,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                         EditText etBank = inflate_view.findViewById(R.id.etBank);
                         number = Integer.parseInt(etBank.getText().toString());
 
-                        // Make firebase call to get use info.
+                        // Make firebase call to get player info.
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
                         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -136,15 +139,14 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
                                 Log.d(TAG, wallet.toString());
 
-                                // Perform various checks. First check if the user wallet is empty, then check if the user has banked
-                                // 25 coins already, then check if number input by user is valid i.e. not negative or not over 25
+                                // Perform various checks. First check if the player wallet is empty, then check if the player has banked
+                                // 25 coins already, then check if number input by player is valid i.e. not negative or not over 25
                                 if (!wallet.isEmpty()) {
                                     if(amount_banked!=null){
                                         if (!(amount_banked>25)) {
                                             if(number<=wallet.size() && number>=0 && number<=25) {
 
-                                                // Sort wallet in descending order, so the user deposits
-                                                // the most valuable coins first.
+                                                // Sort wallet in descending order, so the player deposits the most valuable coins first.
                                                 Map<String, Double> sortedWallet = new LinkedHashMap<>();
                                                 wallet.entrySet()
                                                         .stream()
@@ -172,7 +174,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
                                                 amount_banked = number.longValue();
 
-                                                // Update bank, amount_banked (number of coins deposited), and the users wallet on firebase
+                                                // Update bank, amount_banked (number of coins deposited), and the players wallet on firebase
                                                 data.put("amount_banked", amount_banked);
                                                 data.put("bank", bank);
                                                 data.put("wallet", wallet);
@@ -201,18 +203,18 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*
-       Function responsible for getting the users profile image.
+       Function responsible for getting the players profile image.
     */
     public void getProfilePicture() {
         userProfile = (ImageView) findViewById(R.id.userImage);
 
-        // Make call to firebase to get user info.
+        // Make call to firebase to get player info.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                // Check if user has a profile picture, otherwise set default image
+                // Check if player has a profile picture, otherwise set default image
                 if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
                     String profile_url = task.getResult().getData().get("user_image").toString();
 
@@ -231,7 +233,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                             ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
                             Bitmap bitmap;
                             bitmap = BitmapFactory.decodeStream(inputStream);
-                            userProfile.setImageBitmap(bitmap);
+                            userProfile.setImageBitmap(bitmap); // set imageview to downloaded image
                         }
                     });
                 } else {

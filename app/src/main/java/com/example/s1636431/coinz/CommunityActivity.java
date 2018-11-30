@@ -7,7 +7,10 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 
-
+/*
+    This activity is the basis for each for the various fragments. It creates each of the tab fragments and adds them
+    to the page
+ */
 public class CommunityActivity extends AppCompatActivity {
 
     private static final String TAG = "CommunityActivity";
@@ -23,13 +26,12 @@ public class CommunityActivity extends AppCompatActivity {
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         setupViewPager(mViewPager);
 
-        // Set up the tabLayout with the sections adapter.
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
     }
 
-
+    // Sets up the 3 fragments and adds them to the adapter
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
         adapter.addFragment(new ProfilePageFragment(), "Profile Page");

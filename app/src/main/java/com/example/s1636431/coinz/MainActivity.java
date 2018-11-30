@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Begin time trial bonus feature
     private void startTimeTrial() {
-        startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis(); // Get current time to signify start of time trial
         timetrial = true;
         timetrial_used = true;
 
@@ -133,18 +133,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Map<String, Object> data = new HashMap<>();
         data.put("time_trial", timetrial_used);
 
-        dRef.set(data, SetOptions.merge());
+        dRef.set(data, SetOptions.merge()); // Update that time trial has been used for the day on database
     }
 
 
     @Override
     @SuppressLint("SimpleDateFormat")
+    /*
+       When map is ready to be displayed, make call to firebase database to get current users'
+       last login date inorder to check if its a new day or the same day.
+    */
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
         wipeMap(map);
-        /*
-        Call to firebase database to get current users' last login date inorder to check if its a new day or the same day.
-         */
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -171,10 +173,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         wallet = new HashMap<>();
                         ArrayList<String> collected;
                         collected = new ArrayList<>();
-                        timetrial_used = false;
                         Date last_login = new Date();
                         String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(last_login);
 
+                        timetrial_used = false; // reset time trial usage since new day
 
                         data.put("wallet", wallet);
                         data.put("collected", collected);
@@ -182,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         data.put("time_trial", timetrial_used);
 
 
-                        dRef.set(data, SetOptions.merge());
+                        dRef.set(data, SetOptions.merge()); // Update fields on database
 
                         String mapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/" + modifiedDate + "/coinzmap.geojson";
                         Log.d(TAG, mapURL);
@@ -270,7 +272,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     /*
-    Taken from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula, to calculate distance
+    Taken from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula,
+     to calculate distance travelled by user to new location.
      */
     private double calculateDistance(Location location_now,Location location_prev) {
         final int R = 6371;
@@ -293,9 +296,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         within 25m of the player.
      */
     public void checkCoinDistance(Location location) {
-
         if (MapMarkers.markers.isEmpty()) {
-
+            return;
         } else {
             // Make call to firebase to get user info.
             FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -304,14 +306,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
+                    // Get the pieces of data from firebase that we need to update for coin collection
                     bank_amount = task.getResult().getData().get("bank").toString();
                     wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
                     collected = (ArrayList<String>) task.getResult().getData().get("collected");
                     coins_collected = (Long) task.getResult().getData().get("coins_collected");
 
                     Log.d(TAG, String.format("Wallet: %s", wallet_data.toString()));
-
                     Map<String, Object> data = new HashMap<>();
+
                     // For every marker in the map, check if the coins within 20m of the players location
                     for (int i = 0; i < MapMarkers.markers.size(); i++) {
 
@@ -323,7 +326,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         Toast.LENGTH_LONG).show();
                             }
 
-                            Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle());
+
+                            Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle()); // Get feature that corresponds to this coin
                             Log.d(TAG, MapMarkers.markers.get(i).getTitle());
 
                             Double value = fc.properties().get("value").getAsDouble();
@@ -333,8 +337,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             try {
                                 Double rate = MapMarkers.rates.getDouble(name);
                                 Log.d(TAG, "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
-                                // If time trial is active double the coin value, otherwise keep normal value.
-                                if(timetrial) {
+                                if(timetrial) { // If time trial is active double the coin value, otherwise keep normal value.
                                     wallet.put(id_fc, 2*(value * rate));
                                 } else {
                                     wallet.put(id_fc, (value * rate));
@@ -347,10 +350,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Coinz coin = new Coinz(name, value, MainActivity.this);
                             walletList.add(coin);
                             Log.d(TAG, coin.toString());
-                            collected.add(fc.properties().get("id").getAsString());
+                            collected.add(fc.properties().get("id").getAsString()); // Update collected array
 
-                            // Remove marker from the map
-                            map.removeMarker(MapMarkers.markers.get(i).getMarker());
+                            map.removeMarker(MapMarkers.markers.get(i).getMarker()); // Remove marker from the map
                             MapMarkers.markers.remove(i);
                             coins_collected++;
                         }
@@ -379,7 +381,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
-        // present toast or shit
+        Toast.makeText(MainActivity.this, "Need" + permissionsToExplain.get(0)+ " inorder to play Coinz.",
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override

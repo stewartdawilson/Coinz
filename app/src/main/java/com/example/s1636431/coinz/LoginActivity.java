@@ -93,7 +93,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update last login date on firebase and start main activity.
                             Log.d("SIGN IN", "signInWithEmail:success");
                             emailID = email;
                             loggedIn = true;
@@ -108,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(last_login);
 
 
-                            data.put("last_login", modifiedDate);
+                            data.put("last_login", modifiedDate); // update last login date
 
 
                             dRef.set(data, SetOptions.merge());

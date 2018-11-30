@@ -12,7 +12,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-
+/*
+    Adapter for the leadboard fragment. Responsible for displaying all the information on the page. Its given data
+    which is sent from the LeaderBoardFragment in the form of a ArrayList of Hashmaps which holds the users email as the key
+    and their amount for the searched criteria as the value.
+ */
 public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.ViewHolder> {
 
     private LeaderBoardAdapter.ItemClickListener mClickListener;
@@ -35,10 +39,12 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
     @Override
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    // Function displays the data passed into the Adapter by the Fragment
     public void onBindViewHolder(LeaderBoardAdapter.ViewHolder holder, int position) {
         HashMap<String, String> user = mData.get(position);
         Log.d(TAG,user.toString());
 
+        // Iterate over each of the users and display the info on the leaderboard
         for ( String key : user.keySet() ) {
             Log.d(TAG, Integer.toString(position+1));
             holder.rank.setText(Integer.toString(position+1));

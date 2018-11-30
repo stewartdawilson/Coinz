@@ -31,7 +31,10 @@ import java.util.HashMap;
 import java.util.Objects;
 import timber.log.Timber;
 
-
+/*
+    Fragment for the friendslist. Get's the friends the player has from firebase, then sends them to
+    the FriendsListAdapter to be displayed.
+ */
 public class FriendsListFragment extends Fragment {
 
     private static final String TAG = "FriendsListFragment";
@@ -66,9 +69,12 @@ public class FriendsListFragment extends Fragment {
         friendlist = (RecyclerView) view.findViewById(R.id.friendlist);
 
 
+        // Set up search query listener
         search_list.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // If the player searches his own name, do nothing.
+                // Otherwise proceed with search
                 if ( query.equals(MainActivity.mainemail)) {
                     return false;
                 } else {
@@ -81,6 +87,8 @@ public class FriendsListFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 data.clear();
+                // Check if the search box is empty, if the data is empty and addFriendsList is not running.
+                // This is used to redisplay the friends once the player has finished searching.
                 if (newText.isEmpty() && (data.isEmpty()) && !task_running ) {
                     getFriends(getContext());
                 }
@@ -100,29 +108,36 @@ public class FriendsListFragment extends Fragment {
         return view;
     }
 
-
+    /*
+        Function responsible for getting the information to the display the searched user
+        on the friends list recyclerview
+     */
     private void search_user(String query, Context context) {
         searched_user.clear();
 
         if (!query.isEmpty()) {
             data.clear();
 
+            // Get firebase info for player
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference dRef = db.collection("User").document(query);
             dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
+                    // Check if searched user exists
                     if (Objects.requireNonNull(task.getResult()).exists()) {
                         HashMap<String, String> user = new HashMap<>();
                         user.put("email", query);
 
                         HashMap<String, Bitmap> user_data = new HashMap<>();
+                        // Works same way as previous image retrieval has worked, see MenuActivity and the getProfilePicture
+                        // function for more info
                         if (!task.getResult().getData().get("user_image").toString().isEmpty()) {
 
                             String search_image_url = task.getResult().getData().get("user_image").toString();
                             user.put("user_image", search_image_url);
-                            searched_user.add(user);
+                            searched_user.add(user); // append user to the be the current searched user
 
                             Timber.tag(TAG).d("Getting user: %s", query);
 
@@ -140,9 +155,9 @@ public class FriendsListFragment extends Fragment {
                                     Bitmap bitmap;
                                     bitmap = BitmapFactory.decodeStream(inputStream);
                                     user_data.put(query, bitmap);
-                                    data.add(user_data);
+                                    data.add(user_data); // add user to data to be sent to adapter
                                     Timber.tag(TAG).d("Adding searched user: " + query + " to data: " + data.toString());
-                                    friendadapter.notifyDataSetChanged();
+                                    friendadapter.notifyDataSetChanged(); // notify adapter that new data is here
                                 }
 
                             });
@@ -187,6 +202,9 @@ public class FriendsListFragment extends Fragment {
         return bitmap;
     }
 
+    /*
+        Get the all the friends the player has from firebase and store them in an ArrayList
+    */
     private void getFriends(Context context) {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -204,22 +222,24 @@ public class FriendsListFragment extends Fragment {
         });
     }
 
+    /*
+        Function responsible for adding friends player has to friendslist recyclerview.
+     */
     public void addFriendsList(ArrayList<HashMap<String, String>> friendsArray, Context context){
 
-
+        // Check if player has friends
         if (friendsArray.isEmpty()) {
-
             data.clear();
             friendadapter.notifyDataSetChanged();
-
-
-
         } else {
+            // Iterate over friends, get the profile images of them, then add them to data
             for(int i=0; i<friendsArray.size(); i++) {
                 HashMap<String, String> friend = friendsArray.get(i);
                 HashMap<String, Bitmap> friend_data = new HashMap<>();
 
                 String friend_email = friend.get("email");
+                // Works same way as previous image retrieval has worked, see MenuActivity and the getProfilePicture
+                // function for more info
                 if (!Objects.requireNonNull(friend.get("user_image")).isEmpty()) {
 
                     String image_url = friend.get("user_image");
@@ -242,9 +262,9 @@ public class FriendsListFragment extends Fragment {
                                 Bitmap bitmap;
                                 bitmap = BitmapFactory.decodeStream(inputStream);
                                 friend_data.put(friend_email,bitmap);
-                                data.add(friend_data);
+                                data.add(friend_data); // add friend to data to be sent to adapter
                                 Timber.tag(TAG).d("Adding user: " + friend.get("email") + " to data: " + data.toString());
-                                friendadapter.notifyDataSetChanged();
+                                friendadapter.notifyDataSetChanged(); // notify adapter the data has changed
 
                             }
 

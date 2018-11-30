@@ -15,7 +15,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import static java.lang.String.format;
-
+/*
+    Displays statistics for the player.
+ */
 public class StatisticsActivity extends AppCompatActivity {
 
 

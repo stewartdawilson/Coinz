@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.Entry.comparingByValue;
-
+/*
+    Activity responsible for trading of coins.
+ */
 public class TradeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "TradeActivity";
@@ -114,6 +116,10 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
 
 
     @Override
+    /*
+        Works similarly to the updateBank() function in MenuActivity. Displays a dialog box where the player
+        inputs the number of coins they wish to trade
+     */
     public void onClick(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater layoutInflater = this.getLayoutInflater();
@@ -129,7 +135,7 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
                 .setPositiveButton("Trade", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        EditText etTrade = inflate_view.findViewById(R.id.etTrade);
+                        EditText etTrade = inflate_view.findViewById(R.id.etTrade); // Get trade amount from text box
                         number = Integer.parseInt(etTrade.getText().toString());
 
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -139,13 +145,15 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 Map<String, Object> data = new HashMap<>();
 
-
                                 HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
                                 Log.d(TAG, wallet.toString());
+                                // Check if players wallet is empty, if so display message telling them
                                 if (!wallet.isEmpty()) {
+                                    // Check if players trade amount doesn't exceed wallet size and that the number isnt negative
                                     if(number<=wallet.size() && number>=0) {
 
                                         Map<String, Double> sortedWallet = new LinkedHashMap<>();
+                                        // Sort the wallet so its in ascending order so the player trades least valuable coins first
                                         wallet.entrySet()
                                                 .stream()
                                                 .sorted(comparingByValue())
@@ -155,6 +163,7 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
                                         int count = 0;
                                         trade_amount = 0.0;
                                         trade_amount_final = 0L;
+                                        // Remove coins from wallet and update total trade value
                                         for (String key : sortedWallet.keySet()) {
                                             if(count==number) {
                                                 break;
@@ -168,21 +177,23 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
                                         trade_amount_final = Math.round(trade_amount);
 
 
-                                        data.put("wallet", wallet);
+                                        data.put("wallet", wallet); // send updated wallet back to firebase
                                         dRef.update(data);
 
 
 
+                                        // Get the info for the user player wants to trade to
                                         DocumentReference dRef = db.collection("User").document(email);
                                         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 Map<String, Object> data = new HashMap<>();
 
+                                                // Update the users bank account with new value from trade
                                                 Long bank = (Long) task.getResult().getData().get("bank");
                                                 bank += trade_amount_final;
 
-                                                data.put("bank", bank);
+                                                data.put("bank", bank); // send updated value back to firebase
                                                 dRef.set(data, SetOptions.merge());
                                             }
                                         });
