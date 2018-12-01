@@ -1,6 +1,7 @@
 package com.example.s1636431.coinz;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static java.util.Map.Entry.comparingByValue;
 /*
@@ -55,9 +58,15 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trade);
 
-        getProfilePicture(getCurrentFocus());
-
         email = this.getIntent().getStringExtra("email");
+        Log.d(TAG, email);
+
+
+        getProfilePicture();
+
+
+        friendImage = (ImageView) findViewById(R.id.userTradeImage);
+
 
         txEmail = (TextView) findViewById(R.id.userTradeID);
         txEmail.setText(email);
@@ -71,15 +80,14 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
     /*
       Function responsible for getting the users profile image.
    */
-    public void getProfilePicture(View view) {
-        friendImage = (ImageView) view.findViewById(R.id.userProfileImage);
+    public void getProfilePicture() {
 
         Log.d(TAG, "On trade page");
 
 
         // Make call to firebase to get user info.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+        DocumentReference dRef = db.collection("User").document(email);
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -124,6 +132,8 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater layoutInflater = this.getLayoutInflater();
         View inflate_view = layoutInflater.inflate(R.layout.trade_box, null);
+        EditText etTrade = inflate_view.findViewById(R.id.etTrade); // Get trade amount from text box
+        etTrade.setTransformationMethod(null);
         builder.setMessage("TRADING!")
                 .setView(inflate_view)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -135,8 +145,9 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
                 .setPositiveButton("Trade", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        EditText etTrade = inflate_view.findViewById(R.id.etTrade); // Get trade amount from text box
+
                         number = Integer.parseInt(etTrade.getText().toString());
+
 
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
@@ -195,6 +206,10 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
 
                                                 data.put("bank", bank); // send updated value back to firebase
                                                 dRef.set(data, SetOptions.merge());
+                                                Intent intent = new Intent(TradeActivity.this, FriendsListFragment.class);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(intent);
+                                                finish();
                                             }
                                         });
 

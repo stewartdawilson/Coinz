@@ -82,7 +82,11 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.d("USER", MainActivity.mainemail);
         textUser.setText(MainActivity.mainemail);
-        textBank.setText(String.format("Bank: %s Gold", MainActivity.bank_amount));
+        if(MainActivity.bank_amount==null) {
+            textBank.setText(String.format("Bank: %s Gold", 0));
+        } else {
+            textBank.setText(String.format("Bank: %s Gold", MainActivity.bank_amount));
+        }
         getProfilePicture();
     }
 
@@ -192,7 +196,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                                         }
                                     }
                                 } else {
-                                    Toast.makeText(MenuActivity.this, "Your wallet is empty.",
+                                    Toast.makeText(MenuActivity.this, R.string.toastEmptyWallet,
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }

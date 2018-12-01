@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,8 @@ import java.net.URL;
  */
 
 public class DownloadFileTask extends AsyncTask<String, Void, String> {
+
+    private final String TAG = "DownloadFileTask";
 
     private MapboxMap map;
     @SuppressLint("StaticFieldLeak")
@@ -32,14 +36,16 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
         try {
             return loadFileFromNetwork(urls[0]);
         } catch (IOException e) {
-            return
-                    "Unable to load content. Check your network connection"
-                    ;
+            return "";
         }
     }
 
     private String loadFileFromNetwork(String urlString) throws IOException {
-        return readStream(downloadUrl(new URL(urlString)));
+        try {
+            return readStream(downloadUrl(new URL(urlString)));
+        } catch(IOException e) {
+            return e.toString();
+        }
     }
 
     private InputStream downloadUrl(URL url) throws IOException {
@@ -55,20 +61,25 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
     }
 
     @NonNull
-    private String readStream(InputStream stream)
-            throws IOException {
+    private String readStream(InputStream stream) {
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A"); // decodes the geojson file
         return s.hasNext() ? s.next() : ""; // returns the geojson file in as a String
+
     }
 
     @Override
     protected void onPostExecute(String result)
     {
         super.onPostExecute(result);
-        Log.d("RESULT", result);
-        DownloadCompleteRunner.dowloadComplete(result);
-        MapMarkers mapMarkers =  new MapMarkers(map,this.activity, result);
-        mapMarkers.addCoinz(result, this.activity, map); // Once downloaded, add coinz to map
+        if(result.isEmpty()) {
+            Toast.makeText(activity, "Unable to download coins map.", Toast.LENGTH_LONG).show(); // if result was empty stop
+            return;
+        } else {
+            Log.d("RESULT", result);
+            DownloadCompleteRunner.dowloadComplete(result);
+            MapMarkers mapMarkers =  new MapMarkers(map,this.activity, result);
+            mapMarkers.addCoinz(result, this.activity, map); // Once downloaded, add coinz to map
+        }
 
 
     }

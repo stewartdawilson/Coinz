@@ -23,6 +23,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+
 /*
     Fragment for profile page, just displays the players profile picture and their email.
  */
@@ -31,7 +33,7 @@ public class ProfilePageFragment extends Fragment {
     private static final String TAG = "ProfilePageFragment";
 
     ImageView userProfile;
-    TextView txEmail;
+    TextView txEmail, txWeight, txHeight, txWallet, txBank;
 
 
     @Nullable
@@ -41,8 +43,13 @@ public class ProfilePageFragment extends Fragment {
 
 
         txEmail = (TextView) view.findViewById(R.id.txProfileEmail);
+        txWeight = (TextView) view.findViewById(R.id.txEmailWeight);
+        txHeight = (TextView) view.findViewById(R.id.txEmailHeight);
+        txWallet = (TextView) view.findViewById(R.id.txEmailWallet);
+        txBank = (TextView) view.findViewById(R.id.txEmailBank);
+
         txEmail.setText(MainActivity.mainemail);
-        getProfilePicture(view);
+        getUserData(view);
 
 
         return view;
@@ -51,7 +58,7 @@ public class ProfilePageFragment extends Fragment {
     /*
       Function responsible for getting the users profile image.
    */
-    public void getProfilePicture(View view) {
+    public void getUserData(View view) {
         userProfile = (ImageView) view.findViewById(R.id.userProfileImage);
 
         Log.d(TAG, "On profile page");
@@ -65,6 +72,16 @@ public class ProfilePageFragment extends Fragment {
                 // Check if user has a profile picture, otherwise set default image
                 if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
                     String profile_url = task.getResult().getData().get("user_image").toString();
+                    String weight =  task.getResult().getData().get("weight").toString();
+                    String height =  task.getResult().getData().get("height").toString();
+                    String bank =  task.getResult().getData().get("bank").toString();
+                    HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
+                    String wallet_text = String.valueOf(wallet.values().stream().mapToDouble(Number::doubleValue).sum());
+                    txWallet.setText("Wallet Value: " + wallet_text);
+                    txBank.setText("Bank Account: " + bank);
+                    txHeight.setText("Height (m): " + height);
+                    txWeight.setText("Weight (kg): " + weight);
+
 
 
                     FirebaseStorage storage = FirebaseStorage.getInstance();

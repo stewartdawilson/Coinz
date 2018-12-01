@@ -32,6 +32,7 @@
             android:label="@string/title_activity_community"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".TradeActivity" />
+        <activity android:name=".ImageActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

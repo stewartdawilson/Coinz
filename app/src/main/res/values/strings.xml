@@ -29,4 +29,9 @@
     <string name="tut_3">Their are 4 types of coins, marked on your map by the different colors.</string>
     <string name="tut_4">In-order to collect a coin you must be within 25m of the coin, and that\'s all. Collection is done automatically!</string>
     <string name="tut_5">There\'s also a time mode which you activate once a day in the button right of the screen 25m of the coin. In this mode coin values are DOUBLED!</string>
+    <string name="toastSignUpFail">Authentication failed.</string>
+    <string name="toastLoginFail">Authentication failed.</string>
+    <string name="toastLoginSuccess">Login Success!</string>
+    <string name="toastSignUpSuccess">Sign Up Success!</string>
+    <string name="toastEmptyWallet">Your wallet is empty.</string>
 </resources>

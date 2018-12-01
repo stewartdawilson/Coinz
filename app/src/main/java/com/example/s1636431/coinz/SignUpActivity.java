@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -77,39 +78,50 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String password = etPass.getText().toString().trim();
         String height_text = etHeight.getText().toString().trim();
         String weight_text = etWeight.getText().toString().trim();
+        Boolean error = false;
 
         // Make sure emails not empty
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
-            return;
+            error = true;
         }
         // Make sure passwords not empty
         if (password.isEmpty()) {
             etPass.setError("Password is required");
             etPass.requestFocus();
-            return;
+            error = true;
         }
 
         // Make sure heights not empty
         if (height_text.isEmpty()) {
-            etPass.setError("Weight is required");
-            etPass.requestFocus();
-            return;
+            etHeight.setError("Height is required");
+            etHeight.requestFocus();
+            error = true;
         }
 
         // Make sure weights not empty
         if (weight_text.isEmpty()) {
-            etPass.setError("Height is required");
-            etPass.requestFocus();
-            return;
+            etWeight.setError("Weight is required");
+            etWeight.requestFocus();
+            error = true;
         }
 
         // Make sure passwords length is at least 6
-        if (password.length() < 6) {
+        if (password.length() < 6 && !password.isEmpty()) {
             etPass.setError("Minimum length of password should be 6");
             etPass.requestFocus();
+            error = true;
+        }
+        if(error) {
             return;
+        }
+
+        // Make sure email is valid
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Valid email is required");
+            etEmail.requestFocus();
+            error = true;
         }
 
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -158,12 +170,14 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             data.put("last_login", modifiedDate);
 
                             dRef.set(data, SetOptions.merge()); // Add user to firebase
+                            Toast.makeText(SignUpActivity.this, R.string.toastSignUpSuccess,
+                                    Toast.LENGTH_SHORT).show();
 
-                            startActivity(new Intent(SignUpActivity.this,TutorialActivity.class));
+                            startActivity(new Intent(SignUpActivity.this,ImageActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("SIGN IN", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                            Toast.makeText(SignUpActivity.this, R.string.toastSignUpFail,
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
