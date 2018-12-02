@@ -128,7 +128,14 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         EditText etBank = inflate_view.findViewById(R.id.etBank);
+
+                        if(etBank.getText().toString().isEmpty()) {
+                            etBank.setError("Please enter a number");
+                            etBank.requestFocus();
+                            return;
+                        }
                         number = Integer.parseInt(etBank.getText().toString());
+
 
                         // Make firebase call to get player info.
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -147,8 +154,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                                 // 25 coins already, then check if number input by player is valid i.e. not negative or not over 25
                                 if (!wallet.isEmpty()) {
                                     if(amount_banked!=null){
-                                        if (!(amount_banked>25)) {
-                                            if(number<=wallet.size() && number>=0 && number<=25) {
+                                        if(!(amount_banked+number>25)) {
+                                            if(number<=wallet.size() && number>=0) {
 
                                                 // Sort wallet in descending order, so the player deposits the most valuable coins first.
                                                 Map<String, Double> sortedWallet = new LinkedHashMap<>();
@@ -191,7 +198,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                                                         Toast.LENGTH_LONG).show();
                                             }
                                         } else {
-                                            Toast.makeText(MenuActivity.this, "You've already banked 25 coins today!",
+                                            Toast.makeText(MenuActivity.this, R.string.toastBankedLimit,
                                                     Toast.LENGTH_SHORT).show();
                                         }
                                     }

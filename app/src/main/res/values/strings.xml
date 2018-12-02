@@ -34,4 +34,5 @@
     <string name="toastLoginSuccess">Login Success!</string>
     <string name="toastSignUpSuccess">Sign Up Success!</string>
     <string name="toastEmptyWallet">Your wallet is empty.</string>
+    <string name="toastBankedLimit">You\'ve already banked 25 coins today!</string>
 </resources>

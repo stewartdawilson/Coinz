@@ -8,12 +8,22 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -67,16 +77,25 @@ public class MenuActivityTest {
     @Test
     public void emptyWallet() {
 
+        String email = "test@test.com";
+        String password = "123456";
+        String weight_text = "80";
+        String height_text = "1.8";
+
         // Sign Up new user
         onView(withId(R.id.etRemail))
-                .perform(replaceText("joooohnnnnn@test.com"));
+                .perform(replaceText(email));
         onView(withId(R.id.etRpass))
-                .perform(replaceText("123456"));
+                .perform(replaceText(password));
         onView(withId(R.id.etRweight))
-                .perform(replaceText("80"));
+                .perform(replaceText(weight_text));
         onView(withId(R.id.etRheight))
-                .perform(replaceText("1.8"));
+                .perform(replaceText(height_text));
         onView(withId(R.id.btSignUp)).perform(click());
+
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.getCurrentUser().delete();
 
 
         try {
@@ -116,6 +135,236 @@ public class MenuActivityTest {
 
 
         onView(withText(R.string.toastEmptyWallet)).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(email);
+        dRef.delete();
+
     }
+
+    @Test
+    public void depositingTooManyCoinz() {
+
+        String email = "test@test.com";
+        String password = "123456";
+        String weight_text = "80";
+        String height_text = "1.8";
+
+        // Sign Up new user
+        onView(withId(R.id.etRemail))
+                .perform(replaceText(email));
+        onView(withId(R.id.etRpass))
+                .perform(replaceText(password));
+        onView(withId(R.id.etRweight))
+                .perform(replaceText(weight_text));
+        onView(withId(R.id.etRheight))
+                .perform(replaceText(height_text));
+        onView(withId(R.id.btSignUp)).perform(click());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.getCurrentUser().delete();
+
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(email);
+
+        Map<String, Object> data = new HashMap<>();
+        HashMap<String, Double> wallet = new HashMap<>();
+        wallet.put("test1", 60.6);
+        wallet.put("test2", 60.6);
+        wallet.put("test3", 60.6);
+        wallet.put("test4", 60.6);
+        wallet.put("test5", 60.6);
+        wallet.put("test6", 60.6);
+        wallet.put("test7", 60.6);
+        wallet.put("test8", 60.6);
+        wallet.put("test9", 60.6);
+        wallet.put("test10", 60.6);
+        wallet.put("test11", 60.6);
+        wallet.put("test12", 60.6);
+        wallet.put("test13", 60.6);
+        wallet.put("test14", 60.6);
+        wallet.put("test15", 60.6);
+        wallet.put("test16", 60.6);
+        wallet.put("test17", 60.6);
+        wallet.put("test18", 60.6);
+        wallet.put("test19", 60.6);
+        wallet.put("test20", 60.6);
+        wallet.put("test21", 60.6);
+        wallet.put("test22", 60.6);
+        wallet.put("test23", 60.6);
+        wallet.put("test24", 60.6);
+        wallet.put("test25", 60.6);
+        wallet.put("test26", 60.6);
+
+        Integer bank = 0;
+
+        data.put("wallet", wallet);
+        data.put("bank", bank);
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        dRef.set(data, SetOptions.merge());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btGo)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btMenu)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        onView(withId(R.id.btBank)).perform(click());
+
+
+        onView(withId(R.id.etBank)).perform(typeText("26"),closeSoftKeyboard());
+
+        Activity activity = getCurrentActivity();
+
+        onView(withText("Deposit"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(withText(R.string.toastBankedLimit)).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
+
+        dRef.delete();
+
+    }
+
+    @Test
+    public void numberExceedsWallet() {
+
+        String email = "test@test.com";
+        String password = "123456";
+        String weight_text = "80";
+        String height_text = "1.8";
+
+        // Sign Up new user
+        onView(withId(R.id.etRemail))
+                .perform(replaceText(email));
+        onView(withId(R.id.etRpass))
+                .perform(replaceText(password));
+        onView(withId(R.id.etRweight))
+                .perform(replaceText(weight_text));
+        onView(withId(R.id.etRheight))
+                .perform(replaceText(height_text));
+        onView(withId(R.id.btSignUp)).perform(click());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.getCurrentUser().delete();
+
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(email);
+
+        Map<String, Object> data = new HashMap<>();
+        HashMap<String, Double> wallet = new HashMap<>();
+        wallet.put("test1", 60.6);
+        wallet.put("test2", 60.6);
+        wallet.put("test3", 60.6);
+
+
+        Integer bank = 0;
+
+        data.put("wallet", wallet);
+        data.put("bank", bank);
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        dRef.set(data, SetOptions.merge());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btGo)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btMenu)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        onView(withId(R.id.btBank)).perform(click());
+
+
+        onView(withId(R.id.etBank)).perform(typeText("4"),closeSoftKeyboard());
+
+        Activity activity = getCurrentActivity();
+
+        onView(withText("Deposit"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(withText("Can't bank " + 4 + " coins because either amount is negative or number exceeds wallet size.")).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
+
+        dRef.delete();
+
+    }
+
 
 }
