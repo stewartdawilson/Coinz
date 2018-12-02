@@ -50,10 +50,6 @@ public class StatisticsActivity extends AppCompatActivity {
         txtFriends = (TextView) findViewById(R.id.txtFriendsStats);
         txtSteps = (TextView) findViewById(R.id.txtStepsStats);
         txtGold = (TextView) findViewById(R.id.txtGoldStats);
-
-
-
-
     }
 
     private void getData() {

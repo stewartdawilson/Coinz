@@ -108,19 +108,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             loggedIn = true;
                             SignUpActivity.signedIn = false;
 
-
-                            FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            DocumentReference dRef = db.collection("User").document(email);
-
-                            Map<String, Object> data = new HashMap<>();
-                            Date last_login = new Date();
-                            String modifiedDate= new SimpleDateFormat("yyyy/MM/dd").format(last_login);
-
-
-                            data.put("last_login", modifiedDate); // update last login date
-
-
-                            dRef.set(data, SetOptions.merge());
                             Toast.makeText(LoginActivity.this, R.string.toastLoginSuccess,
                                     Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this,MainActivity.class));

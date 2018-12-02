@@ -69,18 +69,20 @@ public class ProfilePageFragment extends Fragment {
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                String weight =  task.getResult().getData().get("weight").toString();
+                String height =  task.getResult().getData().get("height").toString();
+                String bank =  task.getResult().getData().get("bank").toString();
+                HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
+                String wallet_text = String.valueOf(wallet.values().stream().mapToDouble(Number::doubleValue).sum());
+                txWallet.setText("Wallet Value: " + wallet_text);
+                txBank.setText("Bank Account: " + bank);
+                txHeight.setText("Height (m): " + height);
+                txWeight.setText("Weight (kg): " + weight);
                 // Check if user has a profile picture, otherwise set default image
                 if(!task.getResult().getData().get("user_image").toString().isEmpty()) {
                     String profile_url = task.getResult().getData().get("user_image").toString();
-                    String weight =  task.getResult().getData().get("weight").toString();
-                    String height =  task.getResult().getData().get("height").toString();
-                    String bank =  task.getResult().getData().get("bank").toString();
-                    HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
-                    String wallet_text = String.valueOf(wallet.values().stream().mapToDouble(Number::doubleValue).sum());
-                    txWallet.setText("Wallet Value: " + wallet_text);
-                    txBank.setText("Bank Account: " + bank);
-                    txHeight.setText("Height (m): " + height);
-                    txWeight.setText("Weight (kg): " + weight);
+
 
 
 

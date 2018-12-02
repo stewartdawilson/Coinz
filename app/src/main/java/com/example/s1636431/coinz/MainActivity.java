@@ -315,10 +315,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d(TAG, String.format("Wallet: %s", wallet_data.toString()));
                     Map<String, Object> data = new HashMap<>();
 
-                    // For every marker in the map, check if the coins within 20m of the players location
+                    // For every marker in the map, check if the coins within 25m of the players location
                     for (int i = 0; i < MapMarkers.markers.size(); i++) {
 
-                        if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 20) {
+                        if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 25) {
                             // Check to see if time trial is activate and if the time is over
                             if(System.currentTimeMillis()>(startTime+30000)&&timetrial){
                                 timetrial=false;

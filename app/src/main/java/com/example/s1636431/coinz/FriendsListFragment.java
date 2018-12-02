@@ -43,7 +43,7 @@ public class FriendsListFragment extends Fragment {
 
     RecyclerView friendlist;
 
-    private ArrayList<HashMap<String, Bitmap>> data = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> data = new ArrayList<>();
 
     static public ArrayList<HashMap<String, String>> searched_user = new ArrayList<>();
 
@@ -130,47 +130,11 @@ public class FriendsListFragment extends Fragment {
                         HashMap<String, String> user = new HashMap<>();
                         user.put("email", query);
 
-                        HashMap<String, Bitmap> user_data = new HashMap<>();
-                        // Works same way as previous image retrieval has worked, see MenuActivity and the getProfilePicture
-                        // function for more info
-                        if (!task.getResult().getData().get("user_image").toString().isEmpty()) {
+                        String search_image_url = task.getResult().getData().get("user_image").toString();
+                        user.put("user_image", search_image_url);
+                        data.add(user);
+                        friendadapter.notifyDataSetChanged(); // notify adapter the data has changed
 
-                            String search_image_url = task.getResult().getData().get("user_image").toString();
-                            user.put("user_image", search_image_url);
-                            searched_user.add(user); // append user to the be the current searched user
-
-                            Timber.tag(TAG).d("Getting user: %s", query);
-
-                            FirebaseStorage storage = FirebaseStorage.getInstance();
-                            StorageReference storageReference = storage.getReference();
-
-                            StorageReference path = storageReference.child(search_image_url);
-
-                            final long one_megabyte = 1024 * 1024;
-
-                            path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                @Override
-                                public void onSuccess(byte[] bytes) {
-                                    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-                                    Bitmap bitmap;
-                                    bitmap = BitmapFactory.decodeStream(inputStream);
-                                    user_data.put(query, bitmap);
-                                    data.add(user_data); // add user to data to be sent to adapter
-                                    Timber.tag(TAG).d("Adding searched user: " + query + " to data: " + data.toString());
-                                    friendadapter.notifyDataSetChanged(); // notify adapter that new data is here
-                                }
-
-                            });
-
-                        } else {
-                            user.put("user_image", "");
-                            searched_user.add(user);
-                            Bitmap default_image = drawableToBitmap(Objects.requireNonNull(context.getDrawable(R.drawable.ic_user)));
-                            user_data.put(query, default_image);
-                            Timber.tag(TAG).d("Adding searched user: " + query + " to data: " + data.toString());
-                            data.add(user_data);
-                            friendadapter.notifyDataSetChanged();
-                        }
                     } else {
                         Toast.makeText(getContext(), "User doesn't exist!", Toast.LENGTH_SHORT).show();
                         Timber.tag(TAG).d("Searched User that doesn't exist");
@@ -232,53 +196,20 @@ public class FriendsListFragment extends Fragment {
             data.clear();
             friendadapter.notifyDataSetChanged();
         } else {
-            // Iterate over friends, get the profile images of them, then add them to data
+            // Iterate over friends, then add them to data
             for(int i=0; i<friendsArray.size(); i++) {
                 HashMap<String, String> friend = friendsArray.get(i);
-                HashMap<String, Bitmap> friend_data = new HashMap<>();
+                HashMap<String, String> friend_data = new HashMap<>();
 
                 String friend_email = friend.get("email");
-                // Works same way as previous image retrieval has worked, see MenuActivity and the getProfilePicture
-                // function for more info
-                if (!Objects.requireNonNull(friend.get("user_image")).isEmpty()) {
+                String image_url = friend.get("user_image");
 
-                    String image_url = friend.get("user_image");
+                friend_data.put("email",friend_email);
+                friend_data.put("user_image",image_url);
 
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference();
-
-                    StorageReference path = null;
-                    if (image_url != null) {
-                        path = storageReference.child(image_url);
-                    }
-
-                    final long one_megabyte = 1024 * 1024;
-
-                    if (path != null) {
-                        path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                            @Override
-                            public void onSuccess(byte[] bytes) {
-                                ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-                                Bitmap bitmap;
-                                bitmap = BitmapFactory.decodeStream(inputStream);
-                                friend_data.put(friend_email,bitmap);
-                                data.add(friend_data); // add friend to data to be sent to adapter
-                                Timber.tag(TAG).d("Adding user: " + friend.get("email") + " to data: " + data.toString());
-                                friendadapter.notifyDataSetChanged(); // notify adapter the data has changed
-
-                            }
-
-                        });
-                    }
-
-                } else {
-                    Bitmap default_image = drawableToBitmap(Objects.requireNonNull(context.getDrawable(R.drawable.ic_user)));
-                    friend_data.put(friend_email,default_image);
-                    Timber.tag(TAG).d("Adding user: " + friend.get("email") + " to data: " + data.toString());
-                    data.add(friend_data);
-                    friendadapter.notifyDataSetChanged();
-                }
-
+                data.add(friend_data); // add friend to data to be sent to adapter
+                Timber.tag(TAG).d("Adding user: " + friend_email+ " to data: " + data.toString());
+                friendadapter.notifyDataSetChanged(); // notify adapter the data has changed
 
             }
         }

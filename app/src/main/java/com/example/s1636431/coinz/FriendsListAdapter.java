@@ -3,9 +3,11 @@ package com.example.s1636431.coinz;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +16,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -32,13 +39,13 @@ import timber.log.Timber;
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.ViewHolder> {
 
     private ItemClickListener mClickListener;
-    private ArrayList<HashMap<String, Bitmap>> mData;
+    private ArrayList<HashMap<String, String>> mData;
     private LayoutInflater layoutInflater;
     private Context context;
 
     private String TAG = "FriendsListAdapter";
 
-    FriendsListAdapter(Context context, ArrayList<HashMap<String, Bitmap>> data) {
+    FriendsListAdapter(Context context, ArrayList<HashMap<String, String>> data) {
         this.context = context;
         this.mData = data;
         this.layoutInflater = LayoutInflater.from(context);
@@ -54,120 +61,136 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
     @Override
     // Function displays the data passed into the Adapter by the Fragment
     public void onBindViewHolder( ViewHolder holder, int position) {
-        HashMap<String, Bitmap> user = mData.get(position);
+        HashMap<String, String> user = mData.get(position);
 
-        // Iterates over each friend in the array and displays them on the friends list
-        for ( String key : user.keySet() ) {
-            Bitmap image = user.get(key);
-            holder.friendImage.setImageBitmap(image);
-            holder.email.setText(key);
-            // Set up Click listener for the add friend button
-            holder.ebtAddUser.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Get user info from firebase
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
-                    dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            Boolean not_friend = false;
-                            HashMap<String, Object> friends_data = new HashMap<>();
-                            ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
-                            Timber.tag(TAG).d(key);
-                            if(friends!=null) {
-                                // If the player has no friends then add the user.
-                                if (friends.isEmpty()) {
-                                    friends_data.put("friends", FriendsListFragment.searched_user);
-                                    dRef.set(friends_data, SetOptions.merge());
-                                    Toast.makeText(context, "Added as friend!", Toast.LENGTH_SHORT).show();
-                                }
-                                // Check to see if the player is already friends with user
-                                for(HashMap<String, String> friend : friends) {
 
-                                    FriendsListFragment.searched_user.add(friend);
-                                    if (!Objects.equals(friend.get("email"), key)) {
-                                        not_friend = true;
-                                    } else {
-                                        not_friend = false;
-                                        Toast.makeText(context, "Already friend!", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    }
-                                }
-                                // If not friends then add the user
-                                if(not_friend) {
-                                    friends_data.put("friends", FriendsListFragment.searched_user);
-                                    dRef.update(friends_data);
-                                    Toast.makeText(context, "Added as friend!", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-            // Set up Click listener for the remove friend button
-            holder.ebtRemoveUser.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        // Works same way as previous image retrieval has worked, see MenuActivity and the getProfilePicture
+        // function for more info
+        if (!Objects.requireNonNull(user.get("user_image")).isEmpty()) {
+            String image_url = user.get("user_image");
 
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
-                    dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            Boolean is_friend = false;
-                            HashMap<String, Object> friends_data = new HashMap<>();
-                            ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
-                            Timber.tag(TAG).d(key);
-                            if(friends!=null) {
-                                // Check to see if the player has friends
-                                if(!friends.isEmpty()) {
-                                    // Iterate over every friend the player has and see if he's friends with the user
-                                    for(HashMap<String, String> friend : friends) {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference();
 
-                                        if (Objects.equals(friend.get("email"), key)) {
-                                            is_friend = true;
-                                            friends.remove(friend);
-                                            friends_data.put("friends", friends);
-                                            dRef.update(friends_data);
-                                            Toast.makeText(context, "Removed friend!", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        } else {
-                                            is_friend = false;
-                                        }
-                                    }
-                                    // If the user wasn't friends then display message
-                                    if(!is_friend) {
-                                        Toast.makeText(context, "User isn't friends with you.", Toast.LENGTH_SHORT).show();
-                                    }
+            StorageReference path = null;
+            if (image_url != null) {
+                path = storageReference.child(image_url);
+            }
 
-                                } else {
-                                    Toast.makeText(context, "You don't have any friends!", Toast.LENGTH_SHORT).show();
+            final long one_megabyte = 1024 * 1024;
 
-                                }
-                            }
-                        }
-                    });
+            if (path != null) {
+                path.getBytes(one_megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+                        Bitmap bitmap;
+                        bitmap = BitmapFactory.decodeStream(inputStream);
+                        displayUser(holder, bitmap, user);
+                    }
 
-                }
-            });
+                });
+            }
 
-            // Set up Click listener for trading button
-            holder.btTrade.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, TradeActivity.class);
-                    intent.putExtra("email", key); // Store the email of the user he wishes to trade with in the intent
-                    context.startActivity(intent); // Go to trading screen
-
-                }
-            });
-
-            Timber.tag(TAG).d("Adding user: " + key + " to page: ");
+        } else {
+            Bitmap default_image = FriendsListFragment.drawableToBitmap(Objects.requireNonNull(context.getDrawable(R.drawable.ic_user)));
+            displayUser(holder, default_image, user);
         }
+    }
 
+    private void displayUser(ViewHolder holder, Bitmap image, HashMap<String, String> user) {
+        String email = user.get("email");
 
+        holder.friendImage.setImageBitmap(image);
+        holder.email.setText(email);
+        // Set up Click listener for the add friend button
+        holder.ebtAddUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get user info from firebase
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+                dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
+                        HashMap<String, Object> friends_data = new HashMap<>();
+                        ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
+                        Timber.tag(TAG).d(email);
+                        if(friends!=null) {
+                            // If the player has no friends then add the user.
+                            if (friends.isEmpty()) {
+                                friends.add(user);
+                                friends_data.put("friends", friends);
+                                dRef.set(friends_data, SetOptions.merge()); // add friend
+                                Toast.makeText(context, "Added as friend!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Check to see if the player is already friends with user
+                                if(friends.contains(user)) {
+                                    Toast.makeText(context, "Already friend!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    friends.add(user);
+                                    friends_data.put("friends", friends);
+                                    dRef.update(friends_data); // add friend
+                                    Toast.makeText(context, "Added as friend!", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+
+                        }
+                    }
+                });
+            }
+        });
+        // Set up Click listener for the remove friend button
+        holder.ebtRemoveUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference dRef = db.collection("User").document(MainActivity.mainemail);
+                dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        Boolean is_friend = false;
+                        HashMap<String, Object> friends_data = new HashMap<>();
+                        ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
+                        Timber.tag(TAG).d(email);
+                        if(friends!=null) {
+                            // Check to see if the player has friends
+                            if(!friends.isEmpty()) {
+                                // Check if user is already friends
+                                if (friends.contains(user)) {
+                                    friends.remove(user);
+                                    friends_data.put("friends", friends);
+                                    dRef.update(friends_data);
+                                    Toast.makeText(context, "Removed friend!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(context, "User isn't friends with you.", Toast.LENGTH_SHORT).show(); // If the user wasn't friends then display message
+                                }
+
+                            } else {
+                                Toast.makeText(context, "You don't have any friends!", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    }
+                });
+
+            }
+        });
+
+        // Set up Click listener for trading button
+        holder.btTrade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, TradeActivity.class);
+                intent.putExtra("email", email); // Store the email of the user he wishes to trade with in the intent
+                context.startActivity(intent); // Go to trading screen
+
+            }
+        });
+        Timber.tag(TAG).d("Adding user: " + email + " to page: ");
     }
 
     @Override

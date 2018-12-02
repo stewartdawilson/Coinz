@@ -113,9 +113,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             etPass.requestFocus();
             error = true;
         }
-        if(error) {
-            return;
-        }
 
         // Make sure email is valid
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -123,6 +120,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             etEmail.requestFocus();
             error = true;
         }
+        if(error) {
+            return;
+        }
+
+
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -131,8 +133,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         if (task.isSuccessful()) {
                             // Sign in success, create new user in firebase with fields add initial values
                             Log.d("SIGN IN", "createUserWithEmail:success");
-                            Toast.makeText(SignUpActivity.this, "Registration Successful",
-                                    Toast.LENGTH_SHORT).show();
+
                             emailID = email;
                             signedIn = true;
                             LoginActivity.loggedIn = false;
@@ -170,7 +171,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             data.put("last_login", modifiedDate);
 
                             dRef.set(data, SetOptions.merge()); // Add user to firebase
-                            Toast.makeText(SignUpActivity.this, R.string.toastSignUpSuccess,
+                            Toast.makeText(SignUpActivity.this, "Registration Successful",
                                     Toast.LENGTH_SHORT).show();
 
                             startActivity(new Intent(SignUpActivity.this,ImageActivity.class));
