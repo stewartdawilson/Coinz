@@ -241,8 +241,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setCameraPosition(Location location) {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
-                location.getLongitude()),13.0));
-
+                location.getLongitude()),  map.getCameraPosition().zoom));
     }
 
     @Override

@@ -192,19 +192,21 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                                                 dRef.update(data);
 
                                                 textBank.setText(String.format("Bank: %s Gold", bank.toString()));
+                                                Toast.makeText(MenuActivity.this, "Deposited " + number + " coins!",
+                                                        Toast.LENGTH_LONG).show();
 
                                             } else {
-                                                Toast.makeText(MenuActivity.this, "Can't bank " + number + " coins because either amount is negative or number exceeds wallet size.",
+                                                Toast.makeText(MenuActivity.this, "Can't bank " + number + " coins because number exceeds wallet size.",
                                                         Toast.LENGTH_LONG).show();
                                             }
                                         } else {
                                             Toast.makeText(MenuActivity.this, R.string.toastBankedLimit,
-                                                    Toast.LENGTH_SHORT).show();
+                                                    Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 } else {
                                     Toast.makeText(MenuActivity.this, R.string.toastEmptyWallet,
-                                            Toast.LENGTH_SHORT).show();
+                                            Toast.LENGTH_LONG).show();
                                 }
                             }
                         });

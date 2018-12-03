@@ -146,6 +146,12 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
+                        if(etTrade.getText().toString().isEmpty()) {
+                            Toast.makeText(TradeActivity.this, "Please enter a number.",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         number = Integer.parseInt(etTrade.getText().toString());
 
 
@@ -206,10 +212,6 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
 
                                                 data.put("bank", bank); // send updated value back to firebase
                                                 dRef.set(data, SetOptions.merge());
-                                                Intent intent = new Intent(TradeActivity.this, FriendsListFragment.class);
-                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(intent);
-                                                finish();
                                             }
                                         });
 

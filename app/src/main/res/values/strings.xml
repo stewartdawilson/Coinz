@@ -26,13 +26,18 @@
     <string name="continue_game">Continue!</string>
     <string name="welcome">Welcome!</string>
     <string name="tut_2">To play simply walk around with the app open collecting the various coins on the map.</string>
-    <string name="tut_3">Their are 4 types of coins, marked on your map by the different colors.</string>
+    <string name="tut_3">There are 4 types of coins, marked on your map by the different colors.</string>
     <string name="tut_4">In-order to collect a coin you must be within 25m of the coin, and that\'s all. Collection is done automatically!</string>
-    <string name="tut_5">There\'s also a time mode which you activate once a day in the button right of the screen 25m of the coin. In this mode coin values are DOUBLED!</string>
+    <string name="tut_5">There\'s also a time mode which you can activate once a day in the button right of the screen 25m of the coin. In this mode coin values are DOUBLED!</string>
     <string name="toastSignUpFail">Authentication failed.</string>
     <string name="toastLoginFail">Authentication failed.</string>
     <string name="toastLoginSuccess">Login Success!</string>
     <string name="toastSignUpSuccess">Sign Up Success!</string>
     <string name="toastEmptyWallet">Your wallet is empty.</string>
-    <string name="toastBankedLimit">You\'ve already banked 25 coins today!</string>
+    <string name="toastBankedLimit">Can\'t bank amount because that would take you over the deposit limit or you\'ve already deposited 25 coins today!</string>
+    <string name="toastAddedFriend">Added as friend!</string>
+    <string name="toastAlreadyFriend">Already friend!</string>
+    <string name="toastRemovedFriend">Removed friend!</string>
+    <string name="toastNoFriends">You don\'t have any friends!</string>
+    <string name="toastIsntFriends">User isn\'t friends with you.</string>
 </resources>

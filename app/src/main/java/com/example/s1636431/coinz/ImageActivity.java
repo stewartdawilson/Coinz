@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,11 +26,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class ImageActivity extends AppCompatActivity implements View.OnClickListener {
 
-    Button btUpload, btGo;
+    Button btUpload, btContinue;
     ImageView imgUpload;
 
     @Override
@@ -40,19 +38,19 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_image);
 
         imgUpload = (ImageView) findViewById(R.id.imgUpload);
-
+        imgUpload.setImageDrawable(getDrawable(R.drawable.ic_user));
 
         btUpload = (Button) findViewById(R.id.btUpload);
-        btGo = (Button) findViewById(R.id.btGo);
-        btGo.setOnClickListener(this);
+        btContinue = (Button) findViewById(R.id.btContinue);
+        btContinue.setOnClickListener(this);
         btUpload.setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
-        if(v.equals(btGo)) {
-            startActivity(new Intent(ImageActivity.this, MainActivity.class));
+        if(v.equals(btContinue)) {
+            startActivity(new Intent(ImageActivity.this, TutorialActivity.class));
         } else if(v.equals(btUpload)) {
             startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), 1);
         }

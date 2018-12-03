@@ -1,27 +1,18 @@
 package com.example.s1636431.coinz;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.support.test.espresso.core.internal.deps.guava.collect.Iterables;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
-import android.support.test.runner.lifecycle.Stage;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +29,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -93,6 +83,12 @@ public class MenuActivityTest {
                 .perform(replaceText(height_text));
         onView(withId(R.id.btSignUp)).perform(click());
 
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.getCurrentUser().delete();
@@ -104,7 +100,7 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
-        onView(withId(R.id.btGo)).perform(click());
+        onView(withId(R.id.btContinue)).perform(click());
 
         try {
             Thread.sleep(5000);
@@ -143,7 +139,7 @@ public class MenuActivityTest {
     }
 
     @Test
-    public void depositingTooManyCoinz() {
+    public void depositOver25() {
 
         String email = "test@test.com";
         String password = "123456";
@@ -230,7 +226,110 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
-        onView(withId(R.id.btGo)).perform(click());
+        onView(withId(R.id.btContinue)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btMenu)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        onView(withId(R.id.btBank)).perform(click());
+
+
+        onView(withId(R.id.etBank)).perform(typeText("26"),closeSoftKeyboard());
+
+        Activity activity = getCurrentActivity();
+
+        onView(withText("Deposit"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(withText(R.string.toastBankedLimit)).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
+
+        dRef.delete();
+
+    }
+
+    @Test
+    public void numberExceedsDepositLimit() {
+
+        String email = "test@test.com";
+        String password = "123456";
+        String weight_text = "80";
+        String height_text = "1.8";
+
+        // Sign Up new user
+        onView(withId(R.id.etRemail))
+                .perform(replaceText(email));
+        onView(withId(R.id.etRpass))
+                .perform(replaceText(password));
+        onView(withId(R.id.etRweight))
+                .perform(replaceText(weight_text));
+        onView(withId(R.id.etRheight))
+                .perform(replaceText(height_text));
+        onView(withId(R.id.btSignUp)).perform(click());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.getCurrentUser().delete();
+
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(email);
+
+        Map<String, Object> data = new HashMap<>();
+        HashMap<String, Double> wallet = new HashMap<>();
+        wallet.put("test1", 60.6);
+        wallet.put("test2", 60.6);
+        wallet.put("test3", 60.6);
+
+        Integer bank = 0;
+        Integer amount_banked = 23;
+
+
+        data.put("wallet", wallet);
+        data.put("bank", bank);
+        data.put("amount_banked", amount_banked);
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        dRef.set(data, SetOptions.merge());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btContinue)).perform(click());
 
         try {
             Thread.sleep(5000);
@@ -331,7 +430,7 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
-        onView(withId(R.id.btGo)).perform(click());
+        onView(withId(R.id.btContinue)).perform(click());
 
         try {
             Thread.sleep(5000);
@@ -360,11 +459,114 @@ public class MenuActivityTest {
                 .check(matches(isDisplayed()))
                 .perform(click());
 
-        onView(withText("Can't bank " + 4 + " coins because either amount is negative or number exceeds wallet size.")).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
+        onView(withText("Can't bank " + 4 + " coins because number exceeds wallet size.")).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
 
         dRef.delete();
 
     }
+
+    @Test
+    public void depositSuccess() {
+
+        String email = "test@test.com";
+        String password = "123456";
+        String weight_text = "80";
+        String height_text = "1.8";
+
+        // Sign Up new user
+        onView(withId(R.id.etRemail))
+                .perform(replaceText(email));
+        onView(withId(R.id.etRpass))
+                .perform(replaceText(password));
+        onView(withId(R.id.etRweight))
+                .perform(replaceText(weight_text));
+        onView(withId(R.id.etRheight))
+                .perform(replaceText(height_text));
+        onView(withId(R.id.btSignUp)).perform(click());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.getCurrentUser().delete();
+
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference dRef = db.collection("User").document(email);
+
+        Map<String, Object> data = new HashMap<>();
+        HashMap<String, Double> wallet = new HashMap<>();
+        wallet.put("test1", 60.6);
+        wallet.put("test2", 60.6);
+        wallet.put("test3", 60.6);
+
+
+        Integer bank = 0;
+
+        data.put("wallet", wallet);
+        data.put("bank", bank);
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        dRef.set(data, SetOptions.merge());
+
+        try {
+            Thread.sleep(7000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btContinue)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.btMenu)).perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        onView(withId(R.id.btBank)).perform(click());
+
+
+        onView(withId(R.id.etBank)).perform(typeText("3"),closeSoftKeyboard());
+
+        Activity activity = getCurrentActivity();
+
+        onView(withText("Deposit"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(withText("Deposited " + 3 + " coins!")).inRoot(withDecorView(not(is(activity.getWindow().getDecorView())))).check(matches(isDisplayed()));
+
+        dRef.delete();
+
+    }
+
+
 
 
 }

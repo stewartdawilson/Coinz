@@ -10,15 +10,15 @@ import android.widget.Button;
  */
 public class TutorialActivity extends AppCompatActivity {
 
-    Button btContinue;
+    Button btGo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
 
-        btContinue = (Button) findViewById(R.id.btContinue);
-        btContinue.setOnClickListener(new View.OnClickListener() {
+        btGo = (Button) findViewById(R.id.btLetsPlay);
+        btGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(TutorialActivity.this,MainActivity.class));
