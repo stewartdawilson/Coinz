@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Boolean timetrial_used = false;
 
 
-    static public List<Coinz> walletList = new ArrayList<Coinz>();
     static public HashMap<String, Double> wallet = new HashMap<>();
     static public ArrayList<String> collected = new ArrayList<>();
     static public Object wallet_data = new Object();
@@ -274,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Taken from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula,
      to calculate distance travelled by user to new location.
      */
-    private double calculateDistance(Location location_now,Location location_prev) {
+    public double calculateDistance(Location location_now,Location location_prev) {
         final int R = 6371;
         // Radius of the earth in km
         double dLat = deg2rad(location_prev.getLatitude() - location_now.getLatitude());
@@ -286,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return R*c;
     }
 
-    private double deg2rad(double deg) {
+    public double deg2rad(double deg) {
         return deg * (Math.PI / 180);
     }
 
@@ -295,9 +294,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         within 25m of the player.
      */
     public void checkCoinDistance(Location location) {
-        if (MapMarkers.markers.isEmpty()) {
-            return;
-        } else {
+        if (!MapMarkers.markers.isEmpty()) {
             // Make call to firebase to get user info.
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference dRef = db.collection("User").document(mainemail);
@@ -307,8 +304,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     // Get the pieces of data from firebase that we need to update for coin collection
                     bank_amount = task.getResult().getData().get("bank").toString();
-                    wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
-                    collected = (ArrayList<String>) task.getResult().getData().get("collected");
+                    try {
+                        wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
+                    } catch (ClassCastException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        collected = (ArrayList<String>) task.getResult().getData().get("collected");
+                    } catch (ClassCastException e) {
+                        e.printStackTrace();
+                    }
                     coins_collected = (Long) task.getResult().getData().get("coins_collected");
 
                     Log.d(TAG, String.format("Wallet: %s", wallet_data.toString()));
@@ -329,31 +334,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Feature fc = MapMarkers.features.get(MapMarkers.markers.get(i).getTitle()); // Get feature that corresponds to this coin
                             Log.d(TAG, MapMarkers.markers.get(i).getTitle());
 
-                            Double value = fc.properties().get("value").getAsDouble();
-                            String name = fc.properties().get("currency").getAsString();
-                            String id_fc = fc.properties().get("id").getAsString();
-                            Log.d(TAG, name);
-                            try {
-                                Double rate = MapMarkers.rates.getDouble(name);
-                                Log.d(TAG, "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
-                                if(timetrial) { // If time trial is active double the coin value, otherwise keep normal value.
-                                    wallet.put(id_fc, 2*(value * rate));
-                                } else {
-                                    wallet.put(id_fc, (value * rate));
+
+                            Double value;
+                            if (fc != null) {
+                                value = Objects.requireNonNull(fc.properties()).get("value").getAsDouble();
+                                String name = Objects.requireNonNull(fc.properties()).get("currency").getAsString();
+                                String id_fc = Objects.requireNonNull(fc.properties()).get("id").getAsString();
+                                Log.d(TAG, name);
+                                try {
+                                    Double rate = MapMarkers.rates.getDouble(name);
+                                    Log.d(TAG, "Converting coin " + name + " to GOLD and adding GOLD to wallet with value" + (value * rate) + "");
+                                    if(timetrial) { // If time trial is active double the coin value, otherwise keep normal value.
+                                        wallet.put(id_fc, 2*(value * rate));
+                                    } else {
+                                        wallet.put(id_fc, (value * rate));
+                                    }
+                                    Log.d(TAG, wallet.toString());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                Log.d(TAG, wallet.toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+
+                                collected.add(fc.properties().get("id").getAsString()); // Update collected array
+
+                                map.removeMarker(MapMarkers.markers.get(i).getMarker()); // Remove marker from the map
+                                MapMarkers.markers.remove(i);
+                                coins_collected++;
                             }
 
-                            Coinz coin = new Coinz(name, value, MainActivity.this);
-                            walletList.add(coin);
-                            Log.d(TAG, coin.toString());
-                            collected.add(fc.properties().get("id").getAsString()); // Update collected array
-
-                            map.removeMarker(MapMarkers.markers.get(i).getMarker()); // Remove marker from the map
-                            MapMarkers.markers.remove(i);
-                            coins_collected++;
                         }
 
                     }

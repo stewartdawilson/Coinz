@@ -37,6 +37,7 @@
             android:id="@+id/btMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="#e8be00"
             android:text="@string/menu" />
 
     </com.mapbox.mapboxsdk.maps.MapView>

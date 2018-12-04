@@ -15,7 +15,7 @@
         android:background="@drawable/shapelogin"
         android:padding="15dp"
         android:shadowColor="@android:color/transparent"
-        android:text="Let's go!"
+        android:text="Continue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.484"

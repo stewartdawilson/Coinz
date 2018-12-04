@@ -144,70 +144,75 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 Map<String, Object> data = new HashMap<>();
+                                try {
+                                    HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
+                                    Long amount_banked = (Long) task.getResult().getData().get("amount_banked");
 
-                                HashMap<String, Double> wallet = (HashMap<String, Double>) task.getResult().getData().get("wallet");
-                                Long amount_banked = (Long) task.getResult().getData().get("amount_banked");
+                                    Log.d(TAG, wallet.toString());
 
-                                Log.d(TAG, wallet.toString());
+                                    // Perform various checks. First check if the player wallet is empty, then check if the player has banked
+                                    // 25 coins already, then check if number input by player is valid i.e. not negative or not over 25
+                                    if (!wallet.isEmpty()) {
+                                        if(amount_banked!=null){
+                                            if(!(amount_banked+number>25)) {
+                                                if(number<=wallet.size() && number>=0) {
 
-                                // Perform various checks. First check if the player wallet is empty, then check if the player has banked
-                                // 25 coins already, then check if number input by player is valid i.e. not negative or not over 25
-                                if (!wallet.isEmpty()) {
-                                    if(amount_banked!=null){
-                                        if(!(amount_banked+number>25)) {
-                                            if(number<=wallet.size() && number>=0) {
+                                                    // Sort wallet in descending order, so the player deposits the most valuable coins first.
+                                                    Map<String, Double> sortedWallet = new LinkedHashMap<>();
+                                                    wallet.entrySet()
+                                                            .stream()
+                                                            .sorted(comparingByValue(reverseOrder()))
+                                                            .forEachOrdered(x -> sortedWallet.put(x.getKey(), x.getValue()));
 
-                                                // Sort wallet in descending order, so the player deposits the most valuable coins first.
-                                                Map<String, Double> sortedWallet = new LinkedHashMap<>();
-                                                wallet.entrySet()
-                                                        .stream()
-                                                        .sorted(comparingByValue(reverseOrder()))
-                                                        .forEachOrdered(x -> sortedWallet.put(x.getKey(), x.getValue()));
-
-                                                int count = 0;
-                                                bank_amount = 0.0;
-                                                bank_amount_final = 0L;
-                                                // Update bank amount and remove coin from wallet
-                                                for (String key : sortedWallet.keySet()) {
-                                                    if(count==number) {
-                                                        break;
+                                                    int count = 0;
+                                                    bank_amount = 0.0;
+                                                    bank_amount_final = 0L;
+                                                    // Update bank amount and remove coin from wallet
+                                                    for (String key : sortedWallet.keySet()) {
+                                                        if(count==number) {
+                                                            break;
+                                                        }
+                                                        bank_amount += sortedWallet.get(key);
+                                                        count++;
+                                                        wallet.remove(key);
                                                     }
-                                                    bank_amount += sortedWallet.get(key);
-                                                    count++;
-                                                    wallet.remove(key);
+                                                    Log.d(TAG, bank_amount.toString());
+
+                                                    bank_amount_final = Math.round(bank_amount);
+
+                                                    Long bank = (Long) task.getResult().getData().get("bank");
+                                                    bank += bank_amount_final;
+
+                                                    amount_banked = number.longValue();
+
+                                                    // Update bank, amount_banked (number of coins deposited), and the players wallet on firebase
+                                                    data.put("amount_banked", amount_banked);
+                                                    data.put("bank", bank);
+                                                    data.put("wallet", wallet);
+                                                    dRef.update(data);
+
+                                                    textBank.setText(String.format("Bank: %s Gold", bank.toString()));
+                                                    Toast.makeText(MenuActivity.this, "Deposited " + number + " coins!",
+                                                            Toast.LENGTH_LONG).show();
+
+                                                } else {
+                                                    Toast.makeText(MenuActivity.this, "Can't bank " + number + " coins because number exceeds wallet size.",
+                                                            Toast.LENGTH_LONG).show();
                                                 }
-                                                Log.d(TAG, bank_amount.toString());
-
-                                                bank_amount_final = Math.round(bank_amount);
-
-                                                Long bank = (Long) task.getResult().getData().get("bank");
-                                                bank += bank_amount_final;
-
-                                                amount_banked = number.longValue();
-
-                                                // Update bank, amount_banked (number of coins deposited), and the players wallet on firebase
-                                                data.put("amount_banked", amount_banked);
-                                                data.put("bank", bank);
-                                                data.put("wallet", wallet);
-                                                dRef.update(data);
-
-                                                textBank.setText(String.format("Bank: %s Gold", bank.toString()));
-                                                Toast.makeText(MenuActivity.this, "Deposited " + number + " coins!",
-                                                        Toast.LENGTH_LONG).show();
-
                                             } else {
-                                                Toast.makeText(MenuActivity.this, "Can't bank " + number + " coins because number exceeds wallet size.",
+                                                Toast.makeText(MenuActivity.this, R.string.toastBankedLimit,
                                                         Toast.LENGTH_LONG).show();
                                             }
-                                        } else {
-                                            Toast.makeText(MenuActivity.this, R.string.toastBankedLimit,
-                                                    Toast.LENGTH_LONG).show();
                                         }
+                                    } else {
+                                        Toast.makeText(MenuActivity.this, R.string.toastEmptyWallet,
+                                                Toast.LENGTH_LONG).show();
                                     }
-                                } else {
-                                    Toast.makeText(MenuActivity.this, R.string.toastEmptyWallet,
-                                            Toast.LENGTH_LONG).show();
+
+                                } catch (ClassCastException e) {
+                                    e.printStackTrace();
                                 }
+
                             }
                         });
                     }

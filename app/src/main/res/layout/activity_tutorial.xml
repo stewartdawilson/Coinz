@@ -75,7 +75,7 @@
         android:background="@drawable/shapelogin"
         android:padding="15dp"
         android:shadowColor="@android:color/transparent"
-        android:text="@string/continue_game"
+        android:text="Lets play!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

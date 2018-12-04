@@ -139,29 +139,34 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
                 HashMap<String, Object> friends_data = new HashMap<>();
-                ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
-                Timber.tag(TAG).d(email);
-                if(friends!=null) {
-                    // If the player has no friends then add the user.
-                    if (friends.isEmpty()) {
-                        friends.add(user);
-                        friends_data.put("friends", friends);
-                        dRef.set(friends_data, SetOptions.merge()); // add friend
-                        Toast.makeText(context, R.string.toastAddedFriend, Toast.LENGTH_LONG).show();
-                    } else {
-                        // Check to see if the player is already friends with user
-                        if(friends.contains(user)) {
-                            Toast.makeText(context, R.string.toastAlreadyFriend, Toast.LENGTH_LONG).show();
-                        } else {
+                try {
+                    ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
+                    Log.d(TAG, email);
+                    if(friends!=null) {
+                        // If the player has no friends then add the user.
+                        if (friends.isEmpty()) {
                             friends.add(user);
                             friends_data.put("friends", friends);
-                            dRef.update(friends_data); // add friend
+                            dRef.set(friends_data, SetOptions.merge()); // add friend
                             Toast.makeText(context, R.string.toastAddedFriend, Toast.LENGTH_LONG).show();
+                        } else {
+                            // Check to see if the player is already friends with user
+                            if(friends.contains(user)) {
+                                Toast.makeText(context, R.string.toastAlreadyFriend, Toast.LENGTH_LONG).show();
+                            } else {
+                                friends.add(user);
+                                friends_data.put("friends", friends);
+                                dRef.update(friends_data); // add friend
+                                Toast.makeText(context, R.string.toastAddedFriend, Toast.LENGTH_LONG).show();
+                            }
+
                         }
 
                     }
-
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
                 }
+
             }
         });
     }
@@ -173,25 +178,29 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 HashMap<String, Object> friends_data = new HashMap<>();
-                ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
-                Log.d(TAG, email);
-                if(friends!=null) {
-                    // Check to see if the player has friends
-                    if(!friends.isEmpty()) {
-                        // Check if user is already friends
-                        if (friends.contains(user)) {
-                            friends.remove(user);
-                            friends_data.put("friends", friends);
-                            dRef.update(friends_data);
-                            Toast.makeText(context, R.string.toastRemovedFriend, Toast.LENGTH_LONG).show();
+                try {
+                    ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
+                    Log.d(TAG, email);
+                    if(friends!=null) {
+                        // Check to see if the player has friends
+                        if(!friends.isEmpty()) {
+                            // Check if user is already friends
+                            if (friends.contains(user)) {
+                                friends.remove(user);
+                                friends_data.put("friends", friends);
+                                dRef.update(friends_data);
+                                Toast.makeText(context, R.string.toastRemovedFriend, Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(context, R.string.toastIsntFriends, Toast.LENGTH_LONG).show(); // If the user wasn't friends then display message
+                            }
+
                         } else {
-                            Toast.makeText(context, R.string.toastIsntFriends, Toast.LENGTH_LONG).show(); // If the user wasn't friends then display message
+                            Toast.makeText(context, R.string.toastNoFriends, Toast.LENGTH_LONG).show();
+
                         }
-
-                    } else {
-                        Toast.makeText(context, R.string.toastNoFriends, Toast.LENGTH_LONG).show();
-
                     }
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
                 }
             }
         });

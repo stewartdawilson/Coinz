@@ -212,18 +212,19 @@ public class TradeActivity extends AppCompatActivity implements View.OnClickList
 
                                                 data.put("bank", bank); // send updated value back to firebase
                                                 dRef.set(data, SetOptions.merge());
+                                                Toast.makeText(TradeActivity.this, R.string.toastTradeSuccess, Toast.LENGTH_LONG).show();
                                             }
                                         });
 
                                     } else {
-                                        Toast.makeText(TradeActivity.this, "Can't trade " + number + " coins because either amount is negative or number exceeds wallet size.",
+                                        Toast.makeText(TradeActivity.this, "Can't trade " + number + " coins because number exceeds wallet size.",
                                                 Toast.LENGTH_LONG).show();
 
                                     }
 
 
                                 } else {
-                                    Toast.makeText(TradeActivity.this, "Your wallet is empty.",
+                                    Toast.makeText(TradeActivity.this, R.string.toastEmptyWallet,
                                             Toast.LENGTH_SHORT).show();
                                 }
 

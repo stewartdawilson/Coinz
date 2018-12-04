@@ -1,6 +1,7 @@
 package com.example.s1636431.coinz;
 
 import android.app.Activity;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 
@@ -32,6 +33,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -45,7 +47,7 @@ public class MenuActivityTest {
     public ActivityTestRule<SignUpActivity> SignUpActivityRule =
             new ActivityTestRule<>(SignUpActivity.class);
 
-    public static Activity getCurrentActivity() throws IllegalStateException {
+    private static Activity getCurrentActivity() throws IllegalStateException {
         // The array is just to wrap the Activity and be able to access it from the Runnable.
         final Activity[] resumedActivity = new Activity[1];
 
@@ -108,6 +110,16 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
+        ViewInteraction appCompatButtonTut = onView(
+                allOf(withId(R.id.btLetsPlay), withText("Lets play!")));
+        appCompatButtonTut.perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         onView(withId(R.id.btMenu)).perform(click());
 
         try {
@@ -123,6 +135,12 @@ public class MenuActivityTest {
         onView(withId(R.id.etBank)).perform(typeText("5"),closeSoftKeyboard());
 
         Activity activity = getCurrentActivity();
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         onView(withText("Deposit"))
                 .inRoot(isDialog())
@@ -234,6 +252,17 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
+        ViewInteraction appCompatButtonTut = onView(
+                allOf(withId(R.id.btLetsPlay), withText("Lets play!")));
+        appCompatButtonTut.perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         onView(withId(R.id.btMenu)).perform(click());
 
         try {
@@ -249,6 +278,12 @@ public class MenuActivityTest {
         onView(withId(R.id.etBank)).perform(typeText("26"),closeSoftKeyboard());
 
         Activity activity = getCurrentActivity();
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         onView(withText("Deposit"))
                 .inRoot(isDialog())
@@ -334,6 +369,16 @@ public class MenuActivityTest {
         try {
             Thread.sleep(5000);
         } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction appCompatButtonTut = onView(
+                allOf(withId(R.id.btLetsPlay), withText("Lets play!")));
+        appCompatButtonTut.perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -438,6 +483,16 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
+        ViewInteraction appCompatButtonTut = onView(
+                allOf(withId(R.id.btLetsPlay), withText("Lets play!")));
+        appCompatButtonTut.perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         onView(withId(R.id.btMenu)).perform(click());
 
         try {
@@ -453,6 +508,12 @@ public class MenuActivityTest {
         onView(withId(R.id.etBank)).perform(typeText("4"),closeSoftKeyboard());
 
         Activity activity = getCurrentActivity();
+
+        try {
+            Thread.sleep(5000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         onView(withText("Deposit"))
                 .inRoot(isDialog())
@@ -539,6 +600,16 @@ public class MenuActivityTest {
             e.printStackTrace();
         }
 
+        ViewInteraction appCompatButtonTut = onView(
+                allOf(withId(R.id.btLetsPlay), withText("Lets play!")));
+        appCompatButtonTut.perform(click());
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         onView(withId(R.id.btMenu)).perform(click());
 
         try {
@@ -554,6 +625,12 @@ public class MenuActivityTest {
         onView(withId(R.id.etBank)).perform(typeText("3"),closeSoftKeyboard());
 
         Activity activity = getCurrentActivity();
+
+        try {
+            Thread.sleep(3000);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         onView(withText("Deposit"))
                 .inRoot(isDialog())

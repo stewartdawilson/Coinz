@@ -71,100 +71,105 @@ public class MapMarkers {
              @Override
              public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                  // Get users collected array, which holds which coins they've already collected.
-                 ArrayList<String> collected = (ArrayList<String>) task.getResult().getData().get("collected");
-                 Log.d("RESULT", result);
-
-                 // Decode geoJson
-                 FeatureCollection featureCollection = FeatureCollection.fromJson(result);
                  try {
-                     JSONObject json = new JSONObject(result);
-                     Log.d("TESTING", json.toString());
-                     rates = (JSONObject) json.get("rates");
+                     ArrayList<String> collected = (ArrayList<String>) task.getResult().getData().get("collected");
+
+                     Log.d("RESULT", result);
+
+
+                     // Decode geoJson
+                     FeatureCollection featureCollection = FeatureCollection.fromJson(result);
+                     try {
+                         JSONObject json = new JSONObject(result);
+                         Log.d("TESTING", json.toString());
+                         rates = (JSONObject) json.get("rates");
 
                      } catch (JSONException e) {
-                     e.printStackTrace();
-                 }
+                         e.printStackTrace();
+                     }
 
 
-                 // Iterate over every feature (coin) in the geojson file.
-                 for (int i = 0; i< Objects.requireNonNull(featureCollection.features()).size(); i++) {
-                     taken = false;
+                     // Iterate over every feature (coin) in the geojson file.
+                     for (int i = 0; i< Objects.requireNonNull(featureCollection.features()).size(); i++) {
+                         taken = false;
 
 
-                     Feature fc = Objects.requireNonNull(featureCollection.features()).get(i);
-                     // Check is users collected the coin already and set boolean accordingly
-                     if (collected != null) {
-                         for (int j = 0; j<collected.size(); j++) {
-                             if(Objects.requireNonNull(fc.properties()).get("id").getAsString().equals(collected.get(j))) {
-                                 taken = true;
-                                 break;
+                         Feature fc = Objects.requireNonNull(featureCollection.features()).get(i);
+                         // Check is users collected the coin already and set boolean accordingly
+                         if (collected != null) {
+                             for (int j = 0; j<collected.size(); j++) {
+                                 if(Objects.requireNonNull(fc.properties()).get("id").getAsString().equals(collected.get(j))) {
+                                     taken = true;
+                                     break;
+                                 }
+                             }
+                         }
+
+                         // If taken, skip this feature (coin)
+                         if(taken) {
+                             continue;
+                         }
+
+                         Point p = (Point) fc.geometry();
+
+                         // Create icons for map markers
+                         Bitmap bitmap = createIcons(fc);
+
+
+                         JsonObject j = fc.properties();
+                         // Add marker to map according to the currency type
+                         if (j != null) {
+                             switch (j.get("currency").getAsString()) {
+                                 case "QUID":
+
+
+                                     features.put(j.get("id").toString(), fc);
+
+                                     Icon ic_quid = IconFactory.getInstance(activity).fromBitmap(bitmap);
+
+                                     marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_quid);
+                                     markers.add(marker);
+                                     map.addMarker(marker);
+
+                                     break;
+                                 case "SHIL":
+
+                                     features.put(j.get("id").toString(), fc);
+
+                                     Icon ic_shil = IconFactory.getInstance(activity).fromBitmap(bitmap);
+
+                                     marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_shil);
+                                     markers.add(marker);
+                                     map.addMarker(marker);
+
+                                     break;
+                                 case "DOLR":
+
+                                     features.put(j.get("id").toString(), fc);
+
+                                     Icon ic_dolr = IconFactory.getInstance(activity).fromBitmap(bitmap);
+
+                                     marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_dolr);
+                                     markers.add(marker);
+                                     map.addMarker(marker);
+                                     break;
+                                 case "PENY":
+
+                                     features.put(j.get("id").toString(), fc);
+
+                                     Icon ic_peny = IconFactory.getInstance(activity).fromBitmap(bitmap);
+
+                                     marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_peny);
+                                     markers.add(marker);
+                                     map.addMarker(marker);
+
+                                     break;
                              }
                          }
                      }
-
-                     // If taken, skip this feature (coin)
-                     if(taken) {
-                         continue;
-                     }
-
-                     Point p = (Point) fc.geometry();
-
-                     // Create icons for map markers
-                     Bitmap bitmap = createIcons(fc);
-
-
-                     JsonObject j = fc.properties();
-                     // Add marker to map according to the currency type
-                     if (j != null) {
-                         switch (j.get("currency").getAsString()) {
-                             case "QUID":
-
-
-                                 features.put(j.get("id").toString(), fc);
-
-                                 Icon ic_quid = IconFactory.getInstance(activity).fromBitmap(bitmap);
-
-                                 marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_quid);
-                                 markers.add(marker);
-                                 map.addMarker(marker);
-
-                                 break;
-                             case "SHIL":
-
-                                 features.put(j.get("id").toString(), fc);
-
-                                 Icon ic_shil = IconFactory.getInstance(activity).fromBitmap(bitmap);
-
-                                 marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_shil);
-                                 markers.add(marker);
-                                 map.addMarker(marker);
-
-                                 break;
-                             case "DOLR":
-
-                                 features.put(j.get("id").toString(), fc);
-
-                                 Icon ic_dolr = IconFactory.getInstance(activity).fromBitmap(bitmap);
-
-                                 marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_dolr);
-                                 markers.add(marker);
-                                 map.addMarker(marker);
-                                 break;
-                             case "PENY":
-
-                                 features.put(j.get("id").toString(), fc);
-
-                                 Icon ic_peny = IconFactory.getInstance(activity).fromBitmap(bitmap);
-
-                                 marker = new MarkerOptions().position(new LatLng(p.latitude(), p.longitude())).title(j.get("id").toString()).setIcon(ic_peny);
-                                 markers.add(marker);
-                                 map.addMarker(marker);
-
-                                 break;
-                         }
-                     }
+                 } catch (ClassCastException e) {
+                     e.printStackTrace();
                  }
-
              }
          });
     }

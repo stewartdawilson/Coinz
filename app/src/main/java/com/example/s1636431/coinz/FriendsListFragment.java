@@ -176,12 +176,17 @@ public class FriendsListFragment extends Fragment {
         dRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
-                if (friends != null) {
-                    Timber.tag(TAG).d("Getting friends: %s", friends.toString());
+                try {
+                    ArrayList<HashMap<String, String>> friends = (ArrayList<HashMap<String, String>>) task.getResult().getData().get("friends");
+                    if (friends != null) {
+                        Timber.tag(TAG).d("Getting friends: %s", friends.toString());
+                    }
+                    addFriendsList(friends, context);
+                    task_running = false;
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
                 }
-                addFriendsList(friends, context);
-                task_running = false;
+
             }
         });
     }

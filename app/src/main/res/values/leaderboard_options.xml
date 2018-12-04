@@ -3,5 +3,6 @@
     <string-array name="options_array">
         <item>Gold</item>
         <item>Distance</item>
+        <item>Coins Collected</item>
     </string-array>
 </resources>

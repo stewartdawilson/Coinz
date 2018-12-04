@@ -73,7 +73,6 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(result);
         if(result.isEmpty()) {
             Toast.makeText(activity, "Unable to download coins map.", Toast.LENGTH_LONG).show(); // if result was empty stop
-            return;
         } else {
             Log.d("RESULT", result);
             DownloadCompleteRunner.dowloadComplete(result);

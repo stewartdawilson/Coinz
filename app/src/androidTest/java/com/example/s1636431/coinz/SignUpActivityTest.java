@@ -42,15 +42,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("123456"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withText(R.string.toastSignUpFail)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 
@@ -62,17 +62,18 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("123456"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withText(R.string.toastSignUpSuccess)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
 
+        // Delete user
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference dRef = db.collection("User").document("john@test.com");
         dRef.delete();
@@ -91,15 +92,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("1"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withId(R.id.etRpass)).check(matches(hasErrorText("Minimum length of password should be 6")));
     }
 
@@ -111,15 +112,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("123456"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText(""), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withId(R.id.etRweight)).check(matches(hasErrorText("Weight is required")));
     }
 
@@ -131,15 +132,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("123456"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText(""), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withId(R.id.etRheight)).check(matches(hasErrorText("Height is required")));
     }
 
@@ -151,15 +152,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText(""), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withId(R.id.etRpass)).check(matches(hasErrorText("Password is required")));
     }
 
@@ -171,15 +172,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("123456"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withId(R.id.etRemail)).check(matches(hasErrorText("Valid email is required")));
     }
 
@@ -191,15 +192,15 @@ public class SignUpActivityTest {
         // Type text and then press the button.
         onView(withId(R.id.etRpass))
                 .perform(typeText("123456"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRweight))
                 .perform(typeText("80"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Type text and then press the button.
         onView(withId(R.id.etRheight))
                 .perform(typeText("1.8"), closeSoftKeyboard());
-        // Check that the text was changed.
+        // Press button
         onView(withId(R.id.btSignUp)).perform(click());
-
+        // Check error message matches.
         onView(withId(R.id.etRemail)).check(matches(hasErrorText("Email is required")));
     }
 }

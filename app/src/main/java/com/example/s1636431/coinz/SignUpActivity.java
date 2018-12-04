@@ -78,49 +78,45 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String password = etPass.getText().toString().trim();
         String height_text = etHeight.getText().toString().trim();
         String weight_text = etWeight.getText().toString().trim();
-        Boolean error = false;
 
         // Make sure emails not empty
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
-            error = true;
+            return;
         }
         // Make sure passwords not empty
         if (password.isEmpty()) {
             etPass.setError("Password is required");
             etPass.requestFocus();
-            error = true;
+            return;
         }
 
         // Make sure heights not empty
         if (height_text.isEmpty()) {
             etHeight.setError("Height is required");
             etHeight.requestFocus();
-            error = true;
+            return;
         }
 
         // Make sure weights not empty
         if (weight_text.isEmpty()) {
             etWeight.setError("Weight is required");
             etWeight.requestFocus();
-            error = true;
+            return;
         }
 
         // Make sure passwords length is at least 6
         if (password.length() < 6 && !password.isEmpty()) {
             etPass.setError("Minimum length of password should be 6");
             etPass.requestFocus();
-            error = true;
+            return;
         }
 
         // Make sure email is valid
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Valid email is required");
             etEmail.requestFocus();
-            error = true;
-        }
-        if(error) {
             return;
         }
 
@@ -171,7 +167,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             data.put("last_login", modifiedDate);
 
                             dRef.set(data, SetOptions.merge()); // Add user to firebase
-                            Toast.makeText(SignUpActivity.this, "Registration Successful",
+                            Toast.makeText(SignUpActivity.this, R.string.toastSignUpSuccess,
                                     Toast.LENGTH_SHORT).show();
 
                             startActivity(new Intent(SignUpActivity.this,ImageActivity.class));

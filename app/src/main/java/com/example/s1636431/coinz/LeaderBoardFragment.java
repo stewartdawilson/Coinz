@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /*
     Fragment for the leaderboard. Get's all the users of the app from firebase, then sends them to
@@ -33,9 +34,6 @@ import java.util.List;
 public class LeaderBoardFragment extends Fragment {
 
     private static final String TAG = "LeaderBoardFragment";
-
-    private RecyclerView leaderboard;
-    private Spinner spinner;
 
     private ArrayList<HashMap<String, String>> data = new ArrayList<>();
     private ArrayAdapter<CharSequence> adapter;
@@ -49,9 +47,8 @@ public class LeaderBoardFragment extends Fragment {
         View view = inflater.inflate(R.layout.leaderboard_fragment,container,false);
 
 
-
-        leaderboard = (RecyclerView) view.findViewById(R.id.leaderboard);
-        spinner = (Spinner) view.findViewById(R.id.sorter);
+        RecyclerView leaderboard = (RecyclerView) view.findViewById(R.id.leaderboard);
+        Spinner spinner = (Spinner) view.findViewById(R.id.sorter);
         renderSpinner(spinner);
 
         // Set up spinner item select listener
@@ -60,21 +57,28 @@ public class LeaderBoardFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String criteria = parent.getItemAtPosition(pos).toString();
                 // Checks what criteria the user has selected
-                if(criteria.equals("Distance")) {
-                    criteria = "distance";
-                    setLeaderBoard(criteria);
+                switch (criteria) {
+                    case "Distance":
+                        criteria = "distance";
+                        setLeaderBoard(criteria);
 
-                } else if(criteria.equals("Gold")) {
-                    criteria = "gold_alltime";
-                    setLeaderBoard(criteria);
+                        break;
+                    case "Gold":
+                        criteria = "gold_alltime";
+                        setLeaderBoard(criteria);
+                        break;
+                    case "Coins Collected":
+                        criteria = "coins_collected";
+                        setLeaderBoard(criteria);
+                        break;
                 }
+
 
 
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                return;
 
             }
         });
@@ -95,9 +99,7 @@ public class LeaderBoardFragment extends Fragment {
         criteria.
      */
     private void setLeaderBoard(String criteria) {
-        ArrayList<HashMap<String, String>> leaderboard_data = new ArrayList<>();
         data.clear();
-        leaderboard_data.clear();
 
 
         // Get all the users ordered by the given criteria.
@@ -118,13 +120,12 @@ public class LeaderBoardFragment extends Fragment {
 
                     HashMap<String, String> user_data = new HashMap<>();
 
-                    String value = user.getData().get(criteria).toString();
+                    String value = Objects.requireNonNull(Objects.requireNonNull(user.getData()).get(criteria)).toString();
                     user_data.put(email, value);
 
                     Log.d(TAG, String.format("RANKING BY: %s", value));
                     Log.d(TAG, "DATA " + user_data);
 
-                    leaderboard_data.add(user_data);
                     data.add(user_data);
                 }
                 Collections.reverse(data); // reverse data so it's in decreasing order
