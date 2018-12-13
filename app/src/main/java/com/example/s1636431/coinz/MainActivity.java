@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // For every marker in the map, check if the coins within 25m of the players location
                     for (int i = 0; i < MapMarkers.markers.size(); i++) {
 
-                        if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) < 25) {
+                        if (MapMarkers.markers.get(i).getPosition().distanceTo(new LatLng(location.getLatitude(), location.getLongitude())) <= 25) {
                             // Check to see if time trial is activate and if the time is over
                             if(System.currentTimeMillis()>(startTime+30000)&&timetrial){
                                 timetrial=false;
